@@ -1,9 +1,7 @@
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  * Walkes a ZFIN file.
@@ -14,6 +12,9 @@ public class ZFINWalker
 {
 	private ZFINWalker() {};
 	
+	static int COLUMN_GENE_ID = 0;
+	static int COLUMN_GENE_NAME = 1;
+
 	static int COLUMN_TERM1_ID = 6;
 	static int COLUMN_TERM1_NAME = 7;
 
@@ -33,6 +34,9 @@ public class ZFINWalker
 			
 			String [] sp = line.split("\\t");
 
+			entry.geneID = sp[COLUMN_GENE_ID];
+			entry.geneName = sp[COLUMN_GENE_NAME];
+
 			entry.term1ID = sp[COLUMN_TERM1_ID];
 			entry.term1Name = sp[COLUMN_TERM1_NAME];
 
@@ -43,7 +47,6 @@ public class ZFINWalker
 			entry.patoName = sp[COLUMN_PATO_NAME];
 			
 			visitor.visit(entry);
-
 		}
 	}
 }

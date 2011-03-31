@@ -6,6 +6,9 @@
  */
 public class ZFINEntry
 {
+	public String geneID;
+	public String geneName;
+
 	public String term1ID;
 	public String term1Name;
 
@@ -14,5 +17,4 @@ public class ZFINEntry
 
 	public String patoID;
 	public String patoName;
-
 }

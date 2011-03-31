@@ -1,12 +1,25 @@
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.util.SimpleIRIMapper;
+
+import com.clarkparsia.owlapi.explanation.util.OntologyUtils;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from
@@ -40,7 +53,7 @@ public class ZP
 	static boolean verbose = true;
 	static Logger log = Logger.getLogger(ZP.class.getName());
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws OWLOntologyCreationException
 	{
 		if (args.length < 1)
 		{
@@ -50,7 +63,25 @@ public class ZP
 		/* FIXME: Addproper command line support */
 		String inputName = args[0];
 		
-		/* Open input file */
+		/* Create ontology manager and IRIs */
+		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		final IRI zpIRI = IRI.create("http://charite.de/zp.owl");
+		final IRI goIRI = IRI.create("http://charite.de/go.owl"); // FIXME
+		final IRI zfaIRI = IRI.create("http://charite.de/zfa.owl"); // FIXME
+		final IRI patoIRI = IRI.create("http://charite.de/pato.owl"); // FIXME
+
+		final IRI documentIRI = IRI.create("file:/tmp/zp.owl");
+		/* Set up a mapping, which maps the ontology to the document IRI */
+		SimpleIRIMapper mapper = new SimpleIRIMapper(zpIRI, documentIRI);
+		manager.addIRIMapper(mapper); 
+
+		/* Now create the ontology */
+		final OWLOntology zp = manager.createOntology(zpIRI);
+		
+		/* Obtain the default data factory */
+		final OWLDataFactory factory = manager.getOWLDataFactory(); 
+		
+		/* Open zf input file */
 		File f = new File(inputName);
 		if (f.isDirectory())
 		{
@@ -64,7 +95,7 @@ public class ZP
 			System.exit(-1);
 		}
 		
-		/* Now read the file */
+		/* Now walk the file and create instances on the fly */
 		try
 		{
 			InputStream is; 
@@ -77,21 +108,65 @@ public class ZP
 			{
 				is = new FileInputStream(f);
 			}
-			
+
 			ZFINWalker.walk(is, new ZFINVisitor()
 			{
+				int id;
+
+				private OWLClass getClass(IRI prefix, String id)
+				{
+					return factory.getOWLClass(IRI.create(prefix + "#" + id));
+				}
+				
+				private OWLClass getClassForOBO(String id)
+				{
+					if (id.startsWith("GO:")) return getClass(goIRI,id.substring(3));
+					else if (id.startsWith("ZFA:")) return getClass(zfaIRI,id.substring(4));
+
+					throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");
+				}
+
+				private OWLClass getQualiClassForOBO(String id)
+				{
+					if (id.startsWith("PATO:")) return getClass(goIRI,id.substring(5));
+					throw new RuntimeException("Qualifier must be a pato term");
+				}
+
 				public boolean visit(ZFINEntry entry)
 				{
-					System.out.println(entry.patoID);
+					OWLClass zpTerm = getClass(zpIRI,String.format("%07d",id));
+					OWLClass pato = getQualiClassForOBO(entry.patoID);
+					OWLClass cl1 = getClassForOBO(entry.term1ID);
+					OWLClassExpression intersectionExpression;
+
+					if (entry.term2ID != null && entry.term2ID.length() > 0)
+					{
+						intersectionExpression = factory.getOWLObjectIntersectionOf(zpTerm); 
+					} else
+					{
+						intersectionExpression = factory.getOWLObjectIntersectionOf(zpTerm);
+					}
+					
+					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+
+					AddAxiom addAx = new AddAxiom(zp, axiom);
+					manager.applyChange(addAx);
+
+					id++;
 					return true;
 				}
 			});
 
+			//manager.saveOntology(zp,System.out);
+			manager.saveOntology(zp);
 		} catch (FileNotFoundException e)
 		{
 			System.err.println(String.format("Specified file \"%s\" doesn't exists!",inputName));
 		} catch (IOException e)
 		{
+			e.printStackTrace();
+		} catch (OWLOntologyStorageException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

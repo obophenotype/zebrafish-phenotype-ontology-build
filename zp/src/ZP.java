@@ -12,14 +12,13 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
-
-import com.clarkparsia.owlapi.explanation.util.OntologyUtils;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from
@@ -66,6 +65,7 @@ public class ZP
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://charite.de/zp.owl");
+		final IRI bspoIRI = IRI.create("http://charite.de/bspo.owl"); // FIXME
 		final IRI goIRI = IRI.create("http://charite.de/go.owl"); // FIXME
 		final IRI zfaIRI = IRI.create("http://charite.de/zfa.owl"); // FIXME
 		final IRI patoIRI = IRI.create("http://charite.de/pato.owl"); // FIXME
@@ -95,6 +95,9 @@ public class ZP
 			System.exit(-1);
 		}
 		
+		final OWLObjectProperty inheresIn = factory.getOWLObjectProperty(IRI.create("#inheres_in"));
+		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create("#part_of"));
+		
 		/* Now walk the file and create instances on the fly */
 		try
 		{
@@ -122,13 +125,14 @@ public class ZP
 				{
 					if (id.startsWith("GO:")) return getClass(goIRI,id.substring(3));
 					else if (id.startsWith("ZFA:")) return getClass(zfaIRI,id.substring(4));
+					else if (id.startsWith("BSPO:")) return getClass(bspoIRI,id.substring(5));
 
 					throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");
 				}
 
 				private OWLClass getQualiClassForOBO(String id)
 				{
-					if (id.startsWith("PATO:")) return getClass(goIRI,id.substring(5));
+					if (id.startsWith("PATO:")) return getClass(patoIRI,id.substring(5));
 					throw new RuntimeException("Qualifier must be a pato term");
 				}
 
@@ -141,10 +145,14 @@ public class ZP
 
 					if (entry.term2ID != null && entry.term2ID.length() > 0)
 					{
-						intersectionExpression = factory.getOWLObjectIntersectionOf(zpTerm); 
+						OWLClass cl2 = getClassForOBO(entry.term2ID);
+						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+								factory.getOWLObjectSomeValuesFrom(inheresIn, 
+									factory.getOWLObjectIntersectionOf(cl1,factory.getOWLObjectSomeValuesFrom(partOf, cl2)))); 
 					} else
 					{
-						intersectionExpression = factory.getOWLObjectIntersectionOf(zpTerm);
+						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1)); 
 					}
 					
 					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);

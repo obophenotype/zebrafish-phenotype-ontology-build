@@ -4,8 +4,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Walkes a ZFIN file.
- * 
+ * Walkes a ZFIN file. The columns of this tab-separated files have following
+ * headings (see http://zfin.org/zf_info/downloads.html#phenotype)
+ *
+ *  0 Genotype ID
+ *  1 Genotype Name
+ *  2 Start Stage ID
+ *  3 Start Stage Name
+ *  4 End Stage ID
+ *  5 End Stage Name
+ *  6 Affected Structure or Process 1 ID
+ *  7 Affected Structure or Process 1 Name
+ *  8 Affected Structure or Process 2 ID
+ *  9 Affected Structure or Process 2 Name
+ *  10 Phenotype Keyword ID
+ *  11 Phenotype Keyword Name
+ *  12 Phenotype Modifier
+ *  13 Publication ID
+ *  14 Environment ID  
+ *
+ * @see http://zfin.org/zf_info/downloads.html#phenotype
  * @author Sebastian Bauer
  */
 public class ZFINWalker

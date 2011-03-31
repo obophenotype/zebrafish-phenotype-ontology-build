@@ -4,9 +4,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Walkes a ZFIN file. The columns of this tab-separated files have following
- * headings (see http://zfin.org/zf_info/downloads.html#phenotype)
- *
+ * Provides a method to walkes a ZFIN file. The columns of these
+ * tab-separated files have following headings (see http://zfin.org/zf_info/downloads.html#phenotype).
+ * Calls {@link ZFINVisitor#visit(ZFINEntry)} for each encountered entry.
+ * 
  *  0 Genotype ID
  *  1 Genotype Name
  *  2 Start Stage ID

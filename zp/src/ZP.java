@@ -54,10 +54,6 @@ public class ZP
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://charite.de/zp.owl");
-//		final IRI bspoIRI = IRI.create("http://charite.de/bspo.owl"); // FIXME
-//		final IRI goIRI = IRI.create("http://charite.de/go.owl"); // FIXME
-//		final IRI zfaIRI = IRI.create("http://charite.de/zfa.owl"); // FIXME
-//		final IRI patoIRI = IRI.create("http://charite.de/pato.owl"); // FIXME
 
 		final IRI documentIRI = IRI.create("file:/tmp/zp.owl");
 		/* Set up a mapping, which maps the ontology to the document IRI */
@@ -105,7 +101,13 @@ public class ZP
 			{
 				int id;
 
-				private OWLClass getClassForOBO(String id)
+				/**
+				 * Returns an entity class for the given obo id.
+				 * 
+				 * @param id
+				 * @return
+				 */
+				private OWLClass getEntityClassForOBOID(String id)
 				{
 					if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:"))
 						return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
@@ -113,7 +115,13 @@ public class ZP
 					throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");
 				}
 
-				private OWLClass getQualiClassForOBO(String id)
+				/**
+				 * Returns an quality class for the given obo id.
+				 * 
+				 * @param id
+				 * @return
+				 */
+				private OWLClass getQualiClassForOBOID(String id)
 				{
 					if (id.startsWith("PATO:")) return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
 
@@ -123,15 +131,15 @@ public class ZP
 				public boolean visit(ZFINEntry entry)
 				{
 					OWLClass zpTerm = factory.getOWLClass(OBOVocabulary.ID2IRI(String.format("ZP:%07d",id)));
-					OWLClass pato = getQualiClassForOBO(entry.patoID);
-					OWLClass cl1 = getClassForOBO(entry.term1ID);
+					OWLClass pato = getQualiClassForOBOID(entry.patoID);
+					OWLClass cl1 = getEntityClassForOBOID(entry.term1ID);
 					OWLClassExpression intersectionExpression;
 					String label;
 
 					/* Create intersections */
 					if (entry.term2ID != null && entry.term2ID.length() > 0)
 					{
-						OWLClass cl2 = getClassForOBO(entry.term2ID);
+						OWLClass cl2 = getEntityClassForOBOID(entry.term2ID);
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
 								factory.getOWLObjectSomeValuesFrom(inheresIn, 
 									factory.getOWLObjectIntersectionOf(cl1,factory.getOWLObjectSomeValuesFrom(partOf, cl2))));

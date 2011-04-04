@@ -139,13 +139,18 @@ public class ZP
 					/* Create intersections */
 					if (entry.term2ID != null && entry.term2ID.length() > 0)
 					{
+						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) */
 						OWLClass cl2 = getEntityClassForOBOID(entry.term2ID);
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
 								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-									factory.getOWLObjectIntersectionOf(cl1,factory.getOWLObjectSomeValuesFrom(partOf, cl2))));
+									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
+						
+						/* Note that is language the last word is the more specific part of the composition, i.e.,
+						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
 						label = entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
 					} else
 					{
+						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> */
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
 								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
 						label = entry.patoName +  " " + entry.term1Name;
@@ -167,8 +172,8 @@ public class ZP
 			});
 
 //			manager.saveOntology(zp,System.out);
-//			manager.saveOntology(zp);
-			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
+			manager.saveOntology(zp);
+//			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
 		} catch (FileNotFoundException e)
 		{
 			System.err.println(String.format("Specified file \"%s\" doesn't exists!",inputName));

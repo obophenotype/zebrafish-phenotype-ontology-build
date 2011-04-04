@@ -6,9 +6,12 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import org.coode.owlapi.obo.parser.OBOOntologyFormat;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -19,6 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from
@@ -121,35 +125,45 @@ public class ZP
 
 				public boolean visit(ZFINEntry entry)
 				{
-					OWLClass zpTerm = getClass(zpIRI,String.format("%07d",id));
+					OWLClass zpTerm = getClass(zpIRI,String.format("ZP_%07d",id));
 					OWLClass pato = getQualiClassForOBO(entry.patoID);
 					OWLClass cl1 = getClassForOBO(entry.term1ID);
 					OWLClassExpression intersectionExpression;
+					String label;
 
+					/* Create intersections */
 					if (entry.term2ID != null && entry.term2ID.length() > 0)
 					{
 						OWLClass cl2 = getClassForOBO(entry.term2ID);
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
 								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-									factory.getOWLObjectIntersectionOf(cl1,factory.getOWLObjectSomeValuesFrom(partOf, cl2)))); 
+									factory.getOWLObjectIntersectionOf(cl1,factory.getOWLObjectSomeValuesFrom(partOf, cl2))));
+						label = entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
 					} else
 					{
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1)); 
+								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
+						label = entry.patoName +  " " + entry.term1Name;
 					}
-					
-					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
 
-					AddAxiom addAx = new AddAxiom(zp, axiom);
-					manager.applyChange(addAx);
+					/* Add subclass axiom */
+					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+					manager.addAxiom(zp,axiom);
+
+					/* Add label */
+					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
+					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
+					manager.addAxiom(zp,labelAnnoAxiom);
+
 
 					id++;
 					return true;
 				}
 			});
 
-			//manager.saveOntology(zp,System.out);
+//			manager.saveOntology(zp,System.out);
 			manager.saveOntology(zp);
+//			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
 		} catch (FileNotFoundException e)
 		{
 			System.err.println(String.format("Specified file \"%s\" doesn't exists!",inputName));

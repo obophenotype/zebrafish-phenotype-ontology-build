@@ -6,11 +6,8 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.coode.owlapi.obo.parser.OBOConsumer;
-import org.coode.owlapi.obo.parser.OBOOntologyFormat;
 import org.coode.owlapi.obo.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -24,21 +21,21 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from
  * decomposed phenotype - gene associations.
  * 
  * The purpose of this tool is to create an ontology from the definition that
- * can be find in this file (source http://zfin.org/data_transfer/Downloads/phenotype.txt).
- * The file is tab separated.
+ * can be found in this file (source http://zfin.org/data_transfer/Downloads/phenotype.txt).
+ * The input file is tab separated.
  *  
  * @author Sebastian Bauer
  */
 public class ZP
 {
 	static boolean verbose = true;
+
 	static Logger log = Logger.getLogger(ZP.class.getName());
 
 	public static void main(String[] args) throws OWLOntologyCreationException
@@ -80,6 +77,7 @@ public class ZP
 			System.exit(-1);
 		}
 		
+		/* FIXME: Use proper property names */
 		final OWLObjectProperty inheresIn = factory.getOWLObjectProperty(IRI.create("#inheres_in"));
 		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create("#part_of"));
 		
@@ -88,21 +86,35 @@ public class ZP
 		{
 			InputStream is; 
 
+			/* Open input file. Try gzip compression first */
 			try
 			{
 				is = new GZIPInputStream(new FileInputStream(f));
+				if (is.markSupported())
+					is.mark(10);
 				is.read();
+				if (is.markSupported())
+					is.reset();
+				else
+					is = new GZIPInputStream(new FileInputStream(f));
 			} catch(IOException ex)
 			{
+				/* We did not succeed in open the file and reading in a byte. We assume that
+				 * the file is not compressed.
+				 */
 				is = new FileInputStream(f);
 			}
 
+			/* Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to
+			 * collate the classes properly. */
 			ZFINWalker.walk(is, new ZFINVisitor()
 			{
 				int id;
 
 				/**
-				 * Returns an entity class for the given obo id.
+				 * Returns an entity class for the given obo id. This is a simple wrapper
+				 * for OBOVocabulary.ID2IRI(id) but checks whether the term stems from
+				 * a supported ontology.
 				 * 
 				 * @param id
 				 * @return
@@ -116,7 +128,9 @@ public class ZP
 				}
 
 				/**
-				 * Returns an quality class for the given obo id.
+				 * Returns an quality class for the given obo id.  This is a simple wrapper
+				 * for OBOVocabulary.ID2IRI(id) but checks whether the term stems from
+				 * a supported ontology.
 				 * 
 				 * @param id
 				 * @return
@@ -164,7 +178,6 @@ public class ZP
 					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
 					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
 					manager.addAxiom(zp,labelAnnoAxiom);
-
 
 					id++;
 					return true;

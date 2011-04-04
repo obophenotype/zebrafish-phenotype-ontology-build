@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import org.coode.owlapi.obo.parser.OBOConsumer;
 import org.coode.owlapi.obo.parser.OBOOntologyFormat;
+import org.coode.owlapi.obo.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
@@ -52,10 +54,10 @@ public class ZP
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://charite.de/zp.owl");
-		final IRI bspoIRI = IRI.create("http://charite.de/bspo.owl"); // FIXME
-		final IRI goIRI = IRI.create("http://charite.de/go.owl"); // FIXME
-		final IRI zfaIRI = IRI.create("http://charite.de/zfa.owl"); // FIXME
-		final IRI patoIRI = IRI.create("http://charite.de/pato.owl"); // FIXME
+//		final IRI bspoIRI = IRI.create("http://charite.de/bspo.owl"); // FIXME
+//		final IRI goIRI = IRI.create("http://charite.de/go.owl"); // FIXME
+//		final IRI zfaIRI = IRI.create("http://charite.de/zfa.owl"); // FIXME
+//		final IRI patoIRI = IRI.create("http://charite.de/pato.owl"); // FIXME
 
 		final IRI documentIRI = IRI.create("file:/tmp/zp.owl");
 		/* Set up a mapping, which maps the ontology to the document IRI */
@@ -103,29 +105,24 @@ public class ZP
 			{
 				int id;
 
-				private OWLClass getClass(IRI prefix, String id)
-				{
-					return factory.getOWLClass(IRI.create(prefix + "#" + id));
-				}
-				
 				private OWLClass getClassForOBO(String id)
 				{
-					if (id.startsWith("GO:")) return getClass(goIRI,id.substring(3));
-					else if (id.startsWith("ZFA:")) return getClass(zfaIRI,id.substring(4));
-					else if (id.startsWith("BSPO:")) return getClass(bspoIRI,id.substring(5));
+					if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:"))
+						return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
 
 					throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");
 				}
 
 				private OWLClass getQualiClassForOBO(String id)
 				{
-					if (id.startsWith("PATO:")) return getClass(patoIRI,id.substring(5));
+					if (id.startsWith("PATO:")) return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
+
 					throw new RuntimeException("Qualifier must be a pato term");
 				}
 
 				public boolean visit(ZFINEntry entry)
 				{
-					OWLClass zpTerm = getClass(zpIRI,String.format("ZP_%07d",id));
+					OWLClass zpTerm = factory.getOWLClass(OBOVocabulary.ID2IRI(String.format("ZP:%07d",id)));
 					OWLClass pato = getQualiClassForOBO(entry.patoID);
 					OWLClass cl1 = getClassForOBO(entry.term1ID);
 					OWLClassExpression intersectionExpression;
@@ -162,8 +159,8 @@ public class ZP
 			});
 
 //			manager.saveOntology(zp,System.out);
-			manager.saveOntology(zp);
-//			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
+//			manager.saveOntology(zp);
+			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
 		} catch (FileNotFoundException e)
 		{
 			System.err.println(String.format("Specified file \"%s\" doesn't exists!",inputName));

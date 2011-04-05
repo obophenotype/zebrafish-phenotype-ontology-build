@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
@@ -20,7 +21,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from
@@ -47,23 +47,24 @@ public class ZP
 		}
 		/* FIXME: Addproper command line support */
 		String inputName = args[0];
+		String outputOntologyName;
+		
+		if (args.length > 1)
+			outputOntologyName = args[1];
+		else
+			outputOntologyName = "zp.owl";
 		
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://charite.de/zp.owl");
 
-		final IRI documentIRI = IRI.create("file:/tmp/zp.owl");
-		/* Set up a mapping, which maps the ontology to the document IRI */
-		SimpleIRIMapper mapper = new SimpleIRIMapper(zpIRI, documentIRI);
-		manager.addIRIMapper(mapper); 
-
-		/* Now create the ontology */
+		/* Now create the zp ontology */
 		final OWLOntology zp = manager.createOntology(zpIRI);
 		
 		/* Obtain the default data factory */
 		final OWLDataFactory factory = manager.getOWLDataFactory(); 
 		
-		/* Open zf input file */
+		/* Open zfin input file */
 		File f = new File(inputName);
 		if (f.isDirectory())
 		{
@@ -73,7 +74,16 @@ public class ZP
 		
 		if (!f.exists())
 		{
-			System.err.println(String.format("Specified file \"%s\" doesn't exists!",inputName));
+			System.err.println(String.format("Specified file \"%s\" doesn't exist!",inputName));
+			System.exit(-1);
+		}
+		
+		
+		/* Check for output file. TODO: Add force option */
+		File of = new File(outputOntologyName);
+		if (of.exists())
+		{
+			System.err.println(String.format("The output file \"%s\" does already exist! Aborting.",outputOntologyName));
 			System.exit(-1);
 		}
 		
@@ -84,7 +94,7 @@ public class ZP
 		/* Now walk the file and create instances on the fly */
 		try
 		{
-			InputStream is; 
+			InputStream is;
 
 			/* Open input file. Try gzip compression first */
 			try
@@ -106,7 +116,7 @@ public class ZP
 			}
 
 			/* Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to
-			 * collate the classes properly. */
+			 * collate the classes properly. We also emit the annotations here. */
 			ZFINWalker.walk(is, new ZFINVisitor()
 			{
 				int id;
@@ -184,12 +194,11 @@ public class ZP
 				}
 			});
 
-//			manager.saveOntology(zp,System.out);
-			manager.saveOntology(zp);
+			manager.saveOntology(zp, new FileOutputStream(of));
 //			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
 		} catch (FileNotFoundException e)
 		{
-			System.err.println(String.format("Specified file \"%s\" doesn't exists!",inputName));
+			System.err.println(String.format("Specified input file \"%s\" doesn't exist!",inputName));
 		} catch (IOException e)
 		{
 			e.printStackTrace();

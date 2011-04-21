@@ -1,7 +1,9 @@
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
@@ -38,7 +40,7 @@ public class ZP
 
 	static Logger log = Logger.getLogger(ZP.class.getName());
 
-	public static void main(String[] args) throws OWLOntologyCreationException
+	public static void main(String[] args) throws OWLOntologyCreationException, IOException
 	{
 		if (args.length < 1)
 		{
@@ -48,6 +50,7 @@ public class ZP
 		/* FIXME: Addproper command line support */
 		String inputName = args[0];
 		String outputOntologyName;
+		String annotationFileName = "zp.annot";
 		
 		if (args.length > 1)
 			outputOntologyName = args[1];
@@ -56,10 +59,13 @@ public class ZP
 		
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		final IRI zpIRI = IRI.create("http://charite.de/zp.owl");
+		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/");
 
 		/* Now create the zp ontology */
 		final OWLOntology zp = manager.createOntology(zpIRI);
+		
+		/* Where to write the annotation file to */
+		final BufferedWriter annotationOut = new BufferedWriter(new FileWriter(annotationFileName));
 		
 		/* Obtain the default data factory */
 		final OWLDataFactory factory = manager.getOWLDataFactory(); 
@@ -88,8 +94,12 @@ public class ZP
 		}
 		
 		/* FIXME: Use proper property names */
-		final OWLObjectProperty inheresIn = factory.getOWLObjectProperty(IRI.create("#inheres_in"));
-		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create("#part_of"));
+		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
+		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "part_of"));
+		
+		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "qualifier"));
+		final OWLClass abnormal				= factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
+		
 		
 		/* Now walk the file and create instances on the fly */
 		try
@@ -154,7 +164,8 @@ public class ZP
 
 				public boolean visit(ZFINEntry entry)
 				{
-					OWLClass zpTerm = factory.getOWLClass(OBOVocabulary.ID2IRI(String.format("ZP:%07d",id)));
+					String zpId = String.format("ZP:%07d",id);
+					OWLClass zpTerm = factory.getOWLClass(OBOVocabulary.ID2IRI(zpId));
 					OWLClass pato = getQualiClassForOBOID(entry.patoID);
 					OWLClass cl1 = getEntityClassForOBOID(entry.term1ID);
 					OWLClassExpression intersectionExpression;
@@ -163,21 +174,23 @@ public class ZP
 					/* Create intersections */
 					if (entry.term2ID != null && entry.term2ID.length() > 0)
 					{
-						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) */
+						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
 						OWLClass cl2 = getEntityClassForOBOID(entry.term2ID);
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
 								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
+									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
+											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
 						
 						/* Note that is language the last word is the more specific part of the composition, i.e.,
 						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
-						label = entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
+						label = "abnormal " + entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
 					} else
 					{
-						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> */
+						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
 						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
-						label = entry.patoName +  " " + entry.term1Name;
+								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
+								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
+						label = "abnormal " + entry.patoName +  " " + entry.term1Name;
 					}
 
 					/* Add subclass axiom */
@@ -189,6 +202,15 @@ public class ZP
 					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
 					manager.addAxiom(zp,labelAnnoAxiom);
 
+					/*
+					 * Writing the annotation file
+					 */
+					try {
+						annotationOut.write(entry.geneID+"\t"+zpId+"\n");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
 					id++;
 					return true;
 				}
@@ -196,6 +218,7 @@ public class ZP
 
 			manager.saveOntology(zp, new FileOutputStream(of));
 //			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
+			annotationOut.close();
 		} catch (FileNotFoundException e)
 		{
 			System.err.println(String.format("Specified input file \"%s\" doesn't exist!",inputName));

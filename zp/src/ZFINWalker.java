@@ -32,9 +32,9 @@ import java.io.InputStreamReader;
  * 
  * @author Sebastian Bauer
  */
-public class ZFINWalkerNew
+public class ZFINWalker
 {
-	private ZFINWalkerNew() {};
+	private ZFINWalker() {};
 	
 	static int COLUMN_ZFIN_GENE_ID = 0;
 	static int COLUMN_ENTREZ_GENE_ID = 1;

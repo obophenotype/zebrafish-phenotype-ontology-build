@@ -127,7 +127,7 @@ public class ZP
 
 			/* Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to
 			 * collate the classes properly. We also emit the annotations here. */
-			ZFINWalkerNew.walk(is, new ZFINVisitor()
+			ZFINWalker.walk(is, new ZFINVisitor()
 			{
 				int id;
 

@@ -87,11 +87,11 @@ public class ZP
 		
 		/* Check for output file. TODO: Add force option */
 		File of = new File(outputOntologyName);
-		if (of.exists())
-		{
-			System.err.println(String.format("The output file \"%s\" does already exist! Aborting.",outputOntologyName));
-			System.exit(-1);
-		}
+//		if (of.exists())
+//		{
+//			System.err.println(String.format("The output file \"%s\" does already exist! Aborting.",outputOntologyName));
+//			System.exit(-1);
+//		}
 		
 		/* FIXME: Use proper property names */
 		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
@@ -127,7 +127,7 @@ public class ZP
 
 			/* Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to
 			 * collate the classes properly. We also emit the annotations here. */
-			ZFINWalker.walk(is, new ZFINVisitor()
+			ZFINWalkerNew.walk(is, new ZFINVisitor()
 			{
 				int id;
 
@@ -164,49 +164,54 @@ public class ZP
 
 				public boolean visit(ZFINEntry entry)
 				{
+					
+					// handle only abnormal entries
+					if (! entry.isAbnormal)
+						return true;
+					
 					String zpId = String.format("ZP:%07d",id);
 					OWLClass zpTerm = factory.getOWLClass(OBOVocabulary.ID2IRI(zpId));
 					OWLClass pato = getQualiClassForOBOID(entry.patoID);
-					OWLClass cl1 = getEntityClassForOBOID(entry.term1ID);
+					OWLClass cl1 = getEntityClassForOBOID(entry.entity1SupertermId);
 					OWLClassExpression intersectionExpression;
 					String label;
 
-					/* Create intersections */
-					if (entry.term2ID != null && entry.term2ID.length() > 0)
-					{
-						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
-						OWLClass cl2 = getEntityClassForOBOID(entry.term2ID);
-						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
-											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
-						
-						/* Note that is language the last word is the more specific part of the composition, i.e.,
-						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
-						label = "abnormal " + entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
-					} else
-					{
-						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
-						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
-								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
-						label = "abnormal " + entry.patoName +  " " + entry.term1Name;
-					}
-
-					/* Add subclass axiom */
-					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
-					manager.addAxiom(zp,axiom);
-
-					/* Add label */
-					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
-					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
-					manager.addAxiom(zp,labelAnnoAxiom);
+//					/* Create intersections */
+//					if (entry.term2ID != null && entry.term2ID.length() > 0)
+//					{
+//						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
+//						OWLClass cl2 = getEntityClassForOBOID(entry.term2ID);
+//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+//								factory.getOWLObjectSomeValuesFrom(inheresIn, 
+//									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
+//											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
+//						
+//						/* Note that is language the last word is the more specific part of the composition, i.e.,
+//						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
+//						label = "abnormal " + entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
+//					} else
+//					{
+//						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
+//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+//								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
+//								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
+//						label = "abnormal " + entry.patoName +  " " + entry.term1Name;
+//					}
+//
+//					/* Add subclass axiom */
+//					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+//					manager.addAxiom(zp,axiom);
+//
+//					/* Add label */
+//					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
+//					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
+//					manager.addAxiom(zp,labelAnnoAxiom);
 
 					/*
 					 * Writing the annotation file
 					 */
 					try {
-						annotationOut.write(entry.geneID+"\t"+zpId+"\n");
+						annotationOut.write(entry.geneZfinID+"\t"+entry.geneZfinEntrezId+"\t"+zpId+"\n");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

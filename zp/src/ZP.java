@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
@@ -96,6 +99,7 @@ public class ZP
 		/* FIXME: Use proper property names */
 		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
 		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "part_of"));
+		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		
 		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "qualifier"));
 		final OWLClass abnormal				= factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
@@ -176,29 +180,44 @@ public class ZP
 					OWLClassExpression intersectionExpression;
 					String label;
 
-					/* Create intersections */
+					Set<OWLClassExpression> intersectionList = new LinkedHashSet<OWLClassExpression>();
+					
+					intersectionList.add(pato);
+					intersectionList.add(factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
+					
+					
+					
+					/* Entity 1: Create intersections */
 					if (entry.entity1SubtermId!= null && entry.entity1SubtermId.length() > 0)
 					{
 						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
 						OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
-						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
-											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
+						
+
+						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, 
+								factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
+//						
+//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+//								factory.getOWLObjectSomeValuesFrom(inheresIn, 
+//									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
+//											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
 						
 						/* Note that is language the last word is the more specific part of the composition, i.e.,
 						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
 						label = "abnormal " + entry.patoName +  " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
-					} else
+					} 
+					else
 					{
 						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
-						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
-								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
+//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+//								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
+//								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
+						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
 						label = "abnormal " + entry.patoName +  " " + entry.entity1SupertermName;
 					}
-
+					
 					/* Add subclass axiom */
+					intersectionExpression = factory.getOWLObjectIntersectionOf(intersectionList);
 					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
 					manager.addAxiom(zp,axiom);
 

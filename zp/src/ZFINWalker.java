@@ -70,8 +70,6 @@ public class ZFINWalker
 				}
 				System.out.println("---");
 			}
-			if (sp[9].equals("normal"))
-				continue;
 			
 			entry.geneZfinID = sp[COLUMN_ZFIN_GENE_ID];
 			entry.geneZfinEntrezId = sp[COLUMN_ENTREZ_GENE_ID];

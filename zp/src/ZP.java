@@ -176,36 +176,36 @@ public class ZP
 					OWLClassExpression intersectionExpression;
 					String label;
 
-//					/* Create intersections */
-//					if (entry.term2ID != null && entry.term2ID.length() > 0)
-//					{
-//						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
-//						OWLClass cl2 = getEntityClassForOBOID(entry.term2ID);
-//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-//								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-//									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
-//											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
-//						
-//						/* Note that is language the last word is the more specific part of the composition, i.e.,
-//						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
-//						label = "abnormal " + entry.patoName +  " " + entry.term1Name + " " + entry.term2Name;
-//					} else
-//					{
-//						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
-//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-//								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
-//								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
-//						label = "abnormal " + entry.patoName +  " " + entry.term1Name;
-//					}
-//
-//					/* Add subclass axiom */
-//					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
-//					manager.addAxiom(zp,axiom);
-//
-//					/* Add label */
-//					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
-//					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
-//					manager.addAxiom(zp,labelAnnoAxiom);
+					/* Create intersections */
+					if (entry.entity1SubtermId!= null && entry.entity1SubtermId.length() > 0)
+					{
+						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
+						OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
+						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+								factory.getOWLObjectSomeValuesFrom(inheresIn, 
+									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
+											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
+						
+						/* Note that is language the last word is the more specific part of the composition, i.e.,
+						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
+						label = "abnormal " + entry.patoName +  " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
+					} else
+					{
+						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
+						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
+								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
+								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
+						label = "abnormal " + entry.patoName +  " " + entry.entity1SupertermName;
+					}
+
+					/* Add subclass axiom */
+					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+					manager.addAxiom(zp,axiom);
+
+					/* Add label */
+					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
+					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
+					manager.addAxiom(zp,labelAnnoAxiom);
 
 					/*
 					 * Writing the annotation file

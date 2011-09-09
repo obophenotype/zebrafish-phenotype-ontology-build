@@ -20,6 +20,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -37,6 +38,7 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
  * The input file is tab separated.
  *  
  * @author Sebastian Bauer
+ * @author Sebastian Koehler
  */
 public class ZP
 {
@@ -98,9 +100,9 @@ public class ZP
 //		}
 		
 		/* FIXME: Use proper property names */
-		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
-		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "part_of"));
-		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "towards"));
+		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_inheres_in"));
+		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_part_of"));
+		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_towards"));
 		
 		final OWLObjectProperty towardsBFO 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		final OWLObjectProperty partOfBFO 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
@@ -114,7 +116,7 @@ public class ZP
 		manager.addAxiom(zp,ax2);
 		manager.addAxiom(zp,ax3);
 		
-		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "qualifier"));
+		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_qualifier"));
 		final OWLClass abnormal				= factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
 		
 		/* Now walk the file and create instances on the fly */
@@ -258,7 +260,14 @@ public class ZP
 					
 					/* Add subclass axiom */
 					intersectionExpression = factory.getOWLObjectIntersectionOf(intersectionList);
-					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+					
+					/* according to chris the subclass-axiom avoids ZP-classes to be subsumed 
+					   by another ZP class
+					   we should use equivalent-class-axioms
+					*/
+//					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+					OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, intersectionExpression);
+					
 					manager.addAxiom(zp,axiom);
 
 					/* Add label */

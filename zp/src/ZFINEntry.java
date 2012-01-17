@@ -8,8 +8,8 @@
 public class ZFINEntry
 {
 	public String geneZfinID;
-	public String geneZfinName;
-	public String geneZfinEntrezId;
+//	public String geneZfinName;
+//	public String geneZfinEntrezId;
 
 	public String entity1SupertermId;
 	public String entity1SupertermName;

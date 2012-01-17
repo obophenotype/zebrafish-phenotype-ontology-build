@@ -299,7 +299,7 @@ public class ZP
 					 * Writing the annotation file
 					 */
 					try {
-						annotationOut.write(entry.geneZfinID+"\t"+entry.geneZfinEntrezId+"\t"+zpId+"\n");
+						annotationOut.write(entry.geneZfinID+"\t"+zpId+"\n");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

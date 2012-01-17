@@ -37,21 +37,19 @@ public class ZFINWalker
 	private ZFINWalker() {};
 	
 	static int COLUMN_ZFIN_GENE_ID = 0;
-	static int COLUMN_ENTREZ_GENE_ID = 1;
-	static int COLUMN_GENE_NAME = 3;
 
-	static int COLUMN_TERM1_SUPERTERM_ID = 4;
-	static int COLUMN_TERM1_SUPERTERM_NAME = 5;
-	static int COLUMN_TERM1_SUBTERM_ID = 6;
-	static int COLUMN_TERM1_SUBTERM_NAME = 7;	
-	static int COLUMN_TERM2_SUPERTERM_ID = 8;
-	static int COLUMN_TERM2_SUPERTERM_NAME = 9;
-	static int COLUMN_TERM2_SUBTERM_ID = 10;
-	static int COLUMN_TERM2_SUBTERM_NAME = 11;
+	static int COLUMN_TERM1_SUPERTERM_ID = 6;
+	static int COLUMN_TERM1_SUPERTERM_NAME = 7;
+	static int COLUMN_TERM1_SUBTERM_ID = 8;
+	static int COLUMN_TERM1_SUBTERM_NAME = 9;	
+	static int COLUMN_TERM2_SUPERTERM_ID = 13;
+	static int COLUMN_TERM2_SUPERTERM_NAME = 14;
+	static int COLUMN_TERM2_SUBTERM_ID = 15;
+	static int COLUMN_TERM2_SUBTERM_NAME = 16;
 
-	static int COLUMN_PATO_ID = 12;
-	static int COLUMN_PATO_NAME = 13;
-	static int COLUMN_PATO_ABNORMAL_NORMAL = 14;
+	static int COLUMN_PATO_ID = 10;
+	static int COLUMN_PATO_NAME = 11;
+	static int COLUMN_PATO_ABNORMAL_NORMAL = 12;
 	
 	static public void walk(InputStream input, ZFINVisitor visitor) throws IOException
 	{
@@ -63,17 +61,7 @@ public class ZFINWalker
 			
 			String [] sp = line.split("\\t");
 
-			if ( ! (sp[7].equals("") || sp[9].equals("") )){
-				
-				for (int i : new int[]{0,5,7,9,11,13,14}){
-					System.out.println((i+1)+"  "+sp[i]);
-				}
-				System.out.println("---");
-			}
-			
 			entry.geneZfinID = sp[COLUMN_ZFIN_GENE_ID];
-			entry.geneZfinEntrezId = sp[COLUMN_ENTREZ_GENE_ID];
-			entry.geneZfinName = sp[COLUMN_GENE_NAME];
 
 			entry.entity1SupertermId = sp[COLUMN_TERM1_SUPERTERM_ID];
 			entry.entity1SupertermName = sp[COLUMN_TERM1_SUPERTERM_NAME];

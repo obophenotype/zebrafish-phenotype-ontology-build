@@ -6,12 +6,18 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.coode.owlapi.obo.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -26,7 +32,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 
 /**
@@ -46,22 +51,60 @@ public class ZP
 
 	static Logger log = Logger.getLogger(ZP.class.getName());
 
-	public static void main(String[] args) throws OWLOntologyCreationException, IOException
+	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException
 	{
-		if (args.length < 1)
-		{
-			System.err.println("A input file needs to be specified");
-			System.exit(-1);
-		}
-		/* FIXME: Addproper command line support */
-		String inputName = args[0];
-		String outputOntologyName;
-		String annotationFileName = "zp.annot";
 		
-		if (args.length > 1)
-			outputOntologyName = args[1];
-		else
-			outputOntologyName = "zp.owl";
+		
+		final CommandLineParser commandLineParser 	= new BasicParser();
+		HelpFormatter formatter 						= new HelpFormatter();
+		final Options options 						= new Options();
+		
+		Option zfinFileOpt = new Option("z", "zfin", true, "ZFIN file! (http://zfin.org/data_transfer/Downloads/phenotype.txt)");
+		options.addOption(zfinFileOpt);
+		Option ontoFileOpt = new Option("o","ontology-file", true, "Where the ontology file (e.g. ZP.owl) is written to.");
+		options.addOption(ontoFileOpt);
+		Option annotFileOpt = new Option("a", "annotation-file", true, "Where the annotation file (e.g. ZP.annot) is written to.");
+		options.addOption(annotFileOpt);
+		Option help = new Option( "h", "help",false, "Print this (help-)message.");
+		options.addOption(help);
+		
+		final CommandLine commandLine 	= commandLineParser.parse(options, args);
+
+		/*
+		 * Check if user wants help how to use this program
+		 */
+		if (commandLine.hasOption(help.getOpt()) || commandLine.hasOption(help.getLongOpt())){
+			formatter.printHelp( ZP.class.getSimpleName() , options );
+			return;
+		}
+		
+		
+		final String zfinFilePath 			= getOption(zfinFileOpt, commandLine);
+		final String ontoFilePath 			= getOption(ontoFileOpt, commandLine);
+		final String annotFilePath 			= getOption(annotFileOpt, commandLine);
+		// check that required parameters are set
+		String parameterError = null;
+		
+		if (zfinFilePath == null){
+			parameterError = "missing zfin file!";
+		}
+		else if (ontoFilePath == null){
+			parameterError = "no path to ontology-output-file provided!";
+		}
+		else if (annotFilePath == null){
+			parameterError = "no path to annotation-output-file provided!";
+		}
+		/*
+		 * Maybe something was wrong with the parameter. Print help for 
+		 * the user and die here...
+		 */
+		if (parameterError != null){
+			String className = ZP.class.getSimpleName();
+			
+			formatter.printHelp(className, options);
+			throw new IllegalArgumentException(parameterError);
+		}
+		
 		
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -71,13 +114,13 @@ public class ZP
 		final OWLOntology zp = manager.createOntology(zpIRI);
 		
 		/* Where to write the annotation file to */
-		final BufferedWriter annotationOut = new BufferedWriter(new FileWriter(annotationFileName));
+		final BufferedWriter annotationOut = new BufferedWriter(new FileWriter(annotFilePath));
 		
 		/* Obtain the default data factory */
 		final OWLDataFactory factory = manager.getOWLDataFactory(); 
 		
 		/* Open zfin input file */
-		File f = new File(inputName);
+		File f = new File(zfinFilePath);
 		if (f.isDirectory())
 		{
 			System.err.println("Input file must be a file (as the name suggests) and not a directory.");
@@ -86,18 +129,13 @@ public class ZP
 		
 		if (!f.exists())
 		{
-			System.err.println(String.format("Specified file \"%s\" doesn't exist!",inputName));
+			System.err.println(String.format("Specified file \"%s\" doesn't exist!",zfinFilePath));
 			System.exit(-1);
 		}
 		
 		
-		/* Check for output file. TODO: Add force option */
-		File of = new File(outputOntologyName);
-//		if (of.exists())
-//		{
-//			System.err.println(String.format("The output file \"%s\" does already exist! Aborting.",outputOntologyName));
-//			System.exit(-1);
-//		}
+		File of = new File(ontoFilePath);
+
 		
 		/* FIXME: Use proper property names */
 		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_inheres_in"));
@@ -208,11 +246,6 @@ public class ZP
 
 						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, 
 								factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
-//						
-//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-//								factory.getOWLObjectSomeValuesFrom(inheresIn, 
-//									factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1),
-//											factory.getOWLObjectSomeValuesFrom(qualifier, abnormal))));
 						
 						/* Note that is language the last word is the more specific part of the composition, i.e.,
 						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
@@ -221,9 +254,6 @@ public class ZP
 					else
 					{
 						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
-//						intersectionExpression = factory.getOWLObjectIntersectionOf(pato,
-//								factory.getOWLObjectSomeValuesFrom(inheresIn, cl1),
-//								factory.getOWLObjectSomeValuesFrom(qualifier, abnormal));
 						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
 						label = "abnormally " + entry.patoName +  " " + entry.entity1SupertermName;
 					}
@@ -253,21 +283,11 @@ public class ZP
 						}
 					}
 						
-//						/* Note that is language the last word is the more specific part of the composition, i.e.,
-//						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
-//						label = "abnormal " + entry.patoName +  " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
-					
-					
-					/* Add subclass axiom */
+					/* Create intersection */
 					intersectionExpression = factory.getOWLObjectIntersectionOf(intersectionList);
 					
-					/* according to chris the subclass-axiom avoids ZP-classes to be subsumed 
-					   by another ZP class
-					   we should use equivalent-class-axioms
-					*/
-//					OWLSubClassOfAxiom axiom = factory.getOWLSubClassOfAxiom(zpTerm, intersectionExpression);
+					/* Make term equivalent to the intersection */
 					OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, intersectionExpression);
-					
 					manager.addAxiom(zp,axiom);
 
 					/* Add label */
@@ -290,17 +310,32 @@ public class ZP
 			});
 
 			manager.saveOntology(zp, new FileOutputStream(of));
-//			manager.saveOntology(zp, new OBOOntologyFormat(), System.out);
 			annotationOut.close();
-		} catch (FileNotFoundException e)
+		} 
+		catch (FileNotFoundException e)
 		{
-			System.err.println(String.format("Specified input file \"%s\" doesn't exist!",inputName));
-		} catch (IOException e)
+			System.err.println(String.format("Specified input file \"%s\" doesn't exist!",zfinFilePath));
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
-		} catch (OWLOntologyStorageException e) {
-			// TODO Auto-generated catch block
+		} 
+		catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	
+
+	public static String getOption(Option opt, final CommandLine commandLine) {
+
+		if (commandLine.hasOption(opt.getOpt())) {
+			return commandLine.getOptionValue(opt.getOpt());
+		}
+		if (commandLine.hasOption(opt.getLongOpt())) {
+			return commandLine.getOptionValue(opt.getLongOpt());
+		}
+		return null;
+	}
+	
 }

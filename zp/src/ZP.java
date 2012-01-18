@@ -154,7 +154,7 @@ public class ZP
 		manager.addAxiom(zp,ax2);
 		manager.addAxiom(zp,ax3);
 		
-		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_qualifier"));
+		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "qualifier"));
 		final OWLClass abnormal				= factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
 		
 		/* Now walk the file and create instances on the fly */

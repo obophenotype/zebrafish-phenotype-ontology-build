@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -138,23 +139,23 @@ public class ZP
 
 		
 		/* FIXME: Use proper property names */
-		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
-		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "part_of"));
-		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "towards"));
+//		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
+//		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "part_of"));
+//		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "towards"));
 		
-//		final OWLObjectProperty towardsBFO 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
-//		final OWLObjectProperty partOfBFO 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
-//		final OWLObjectProperty inheresInBFO		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
-		// mapping of 
-		OWLSubObjectPropertyOfAxiom ax1 = factory.getOWLSubObjectPropertyOfAxiom(inheresIn, inheresIn);
-		OWLSubObjectPropertyOfAxiom ax2 = factory.getOWLSubObjectPropertyOfAxiom(partOf, partOf);
-		OWLSubObjectPropertyOfAxiom ax3 = factory.getOWLSubObjectPropertyOfAxiom(towards, towards);
+		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
+		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
+		final OWLObjectProperty inheresIn	= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
+//		// mapping of 
+//		OWLEquivalentObjectPropertiesAxiom ax1 = factory.getOWLEquivalentObjectPropertiesAxiom(inheresIn, inheresInBFO);
+//		OWLEquivalentObjectPropertiesAxiom ax2 = factory.getOWLEquivalentObjectPropertiesAxiom(partOf, partOfBFO);
+//		OWLEquivalentObjectPropertiesAxiom ax3 = factory.getOWLEquivalentObjectPropertiesAxiom(towards, towardsBFO);
+//		
+//		manager.addAxiom(zp,ax1);
+//		manager.addAxiom(zp,ax2);
+//		manager.addAxiom(zp,ax3);
 		
-		manager.addAxiom(zp,ax1);
-		manager.addAxiom(zp,ax2);
-		manager.addAxiom(zp,ax3);
-		
-		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "qualifier"));
+		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_qualifier"));
 		final OWLClass abnormal				= factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
 		
 		/* Now walk the file and create instances on the fly */

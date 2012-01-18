@@ -137,18 +137,18 @@ public class ZP
 		File of = new File(ontoFilePath);
 
 		
-		/* FIXME: Use proper property names */
-		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_inheres_in"));
-		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_part_of"));
-		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_towards"));
+		/* : Use proper property names */
+//		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_inheres_in"));
+//		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_part_of"));
+//		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "TODO_towards"));
 		
 		final OWLObjectProperty towardsBFO 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		final OWLObjectProperty partOfBFO 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
 		final OWLObjectProperty inheresInBFO		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
 		// mapping of 
-		OWLSubObjectPropertyOfAxiom ax1 = factory.getOWLSubObjectPropertyOfAxiom(inheresIn, inheresInBFO);
-		OWLSubObjectPropertyOfAxiom ax2 = factory.getOWLSubObjectPropertyOfAxiom(partOf, partOfBFO);
-		OWLSubObjectPropertyOfAxiom ax3 = factory.getOWLSubObjectPropertyOfAxiom(towards, towardsBFO);
+		OWLSubObjectPropertyOfAxiom ax1 = factory.getOWLSubObjectPropertyOfAxiom(inheresInBFO, inheresInBFO);
+		OWLSubObjectPropertyOfAxiom ax2 = factory.getOWLSubObjectPropertyOfAxiom(partOfBFO, partOfBFO);
+		OWLSubObjectPropertyOfAxiom ax3 = factory.getOWLSubObjectPropertyOfAxiom(towardsBFO, towardsBFO);
 		
 		manager.addAxiom(zp,ax1);
 		manager.addAxiom(zp,ax2);
@@ -244,8 +244,8 @@ public class ZP
 						OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
 						
 
-						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, 
-								factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
+						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresInBFO, 
+								factory.getOWLObjectIntersectionOf(cl2,factory.getOWLObjectSomeValuesFrom(partOfBFO, cl1))));
 						
 						/* Note that is language the last word is the more specific part of the composition, i.e.,
 						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
@@ -254,7 +254,7 @@ public class ZP
 					else
 					{
 						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
-						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
+						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresInBFO, cl1));
 						label = "abnormally " + entry.patoName +  " " + entry.entity1SupertermName;
 					}
 					
@@ -269,8 +269,8 @@ public class ZP
 							/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal*/
 							OWLClass cl4 = getEntityClassForOBOID(entry.entity2SubtermId);
 							
-							intersectionList.add(factory.getOWLObjectSomeValuesFrom(towards, 
-									factory.getOWLObjectIntersectionOf(cl4,factory.getOWLObjectSomeValuesFrom(partOf, cl3))));
+							intersectionList.add(factory.getOWLObjectSomeValuesFrom(towardsBFO, 
+									factory.getOWLObjectIntersectionOf(cl4,factory.getOWLObjectSomeValuesFrom(partOfBFO, cl3))));
 							
 							/* Note that is language the last word is the more specific part of the composition, i.e.,
 							 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
@@ -278,7 +278,7 @@ public class ZP
 							
 						}
 						else{
-							intersectionList.add(factory.getOWLObjectSomeValuesFrom(towards, cl3));
+							intersectionList.add(factory.getOWLObjectSomeValuesFrom(towardsBFO, cl3));
 							label += " towards " + entry.entity2SupertermName;
 						}
 					}

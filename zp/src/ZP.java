@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -155,7 +156,7 @@ public class ZP
 //		manager.addAxiom(zp,ax2);
 //		manager.addAxiom(zp,ax3);
 		
-		// RO_0002180 = qualifier
+		// RO_0002180 = "qualifier"
 		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
 		final OWLClass abnormal				= factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
 		
@@ -187,8 +188,13 @@ public class ZP
 			 * collate the classes properly. We also emit the annotations here. */
 			ZFINWalker.walk(is, new ZFINVisitor()
 			{
-				int id;
-
+				
+				/**
+				 * This stores someting like 
+				 */
+				HashMap<String, String> entryIds2zpId = new HashMap<String, String>();
+				int id = 1;
+				
 				/**
 				 * Returns an entity class for the given obo id. This is a simple wrapper
 				 * for OBOVocabulary.ID2IRI(id) but checks whether the term stems from
@@ -227,10 +233,21 @@ public class ZP
 					if (! entry.isAbnormal)
 						return true;
 					
-					String zpId = String.format("ZP:%07d",id);
-					OWLClass zpTerm = factory.getOWLClass(OBOVocabulary.ID2IRI(zpId));
-					OWLClass pato = getQualiClassForOBOID(entry.patoID);
-					OWLClass cl1 = getEntityClassForOBOID(entry.entity1SupertermId);
+					String zpId;
+					String entryStringRep = entry.getEntryAsStringOfIds();
+					if (entryIds2zpId.containsKey(entryStringRep)){
+						zpId 		= entryIds2zpId.get(entryStringRep);
+					}
+					else{
+						zpId 		= String.format("ZP:%07d",id);
+						entryIds2zpId.put(entryStringRep, zpId);
+						id++;
+					}
+					
+					
+					OWLClass zpTerm 	= factory.getOWLClass(OBOVocabulary.ID2IRI(zpId));
+					OWLClass pato 	= getQualiClassForOBOID(entry.patoID);
+					OWLClass cl1 	= getEntityClassForOBOID(entry.entity1SupertermId);
 					OWLClassExpression intersectionExpression;
 					String label;
 
@@ -306,7 +323,6 @@ public class ZP
 						e.printStackTrace();
 					}
 					
-					id++;
 					return true;
 				}
 			});

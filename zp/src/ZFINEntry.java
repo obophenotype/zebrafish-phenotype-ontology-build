@@ -8,8 +8,6 @@
 public class ZFINEntry
 {
 	public String geneZfinID;
-//	public String geneZfinName;
-//	public String geneZfinEntrezId;
 
 	public String entity1SupertermId;
 	public String entity1SupertermName;
@@ -27,4 +25,27 @@ public class ZFINEntry
 	public String patoName;
 	
 	public boolean isAbnormal;
+	
+	
+	/**
+	 * Creates the concatenated string
+	 * representation of the ID's of the
+	 * classes used, e.g. "PATO:0023,ZFA:0234"
+	 * or "PATO:0023,ZFA:3332,PATO:3322,GO:00032"
+	 * @return
+	 */
+	public String getEntryAsStringOfIds(){
+		String separator 		= ",";
+		StringBuffer buffer 		= new StringBuffer();
+		
+		if ( patoID!= null)					buffer.append(patoID+separator);
+		if ( entity1SupertermId != null)		buffer.append(entity1SupertermId+separator);
+		if ( entity1SubtermId != null)		buffer.append(entity1SubtermId+separator);
+		if ( entity2SupertermId != null)		buffer.append(entity2SupertermId+separator);
+		if ( entity2SubtermId != null)		buffer.append(entity2SubtermId+separator);
+		
+		return buffer.toString();
+		
+	}
+	
 }

@@ -53,9 +53,8 @@ public class ZP
 
 	static Logger log = Logger.getLogger(ZP.class.getName());
 
-	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException
+	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException, InterruptedException
 	{
-		
 		
 		final CommandLineParser commandLineParser 	= new BasicParser();
 		HelpFormatter formatter 						= new HelpFormatter();

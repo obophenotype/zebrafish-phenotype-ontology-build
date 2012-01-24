@@ -204,7 +204,7 @@ public class ZP
 				 */
 				private OWLClass getEntityClassForOBOID(String id)
 				{
-					if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:"))
+					if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:") || id.startsWith("MPATH:"))
 						return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
 
 					throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");

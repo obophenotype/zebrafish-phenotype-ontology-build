@@ -51,6 +51,7 @@ public class ZFINWalker
 		String line;
 		while ((line = in.readLine()) != null)
 		{
+			
 			ZFINEntry entry = new ZFINEntry();
 			
 			String [] sp = line.split("\\|");

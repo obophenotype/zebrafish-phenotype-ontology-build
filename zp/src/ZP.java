@@ -30,6 +30,7 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -138,22 +139,11 @@ public class ZP
 		File of = new File(ontoFilePath);
 
 		
-		/* FIXME: Use proper property names */
-//		final OWLObjectProperty inheresIn 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "inheres_in"));
-//		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "part_of"));
-//		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "towards"));
-		
 		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
 		final OWLObjectProperty inheresIn	= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
-//		// mapping of 
-//		OWLEquivalentObjectPropertiesAxiom ax1 = factory.getOWLEquivalentObjectPropertiesAxiom(inheresIn, inheresInBFO);
-//		OWLEquivalentObjectPropertiesAxiom ax2 = factory.getOWLEquivalentObjectPropertiesAxiom(partOf, partOfBFO);
-//		OWLEquivalentObjectPropertiesAxiom ax3 = factory.getOWLEquivalentObjectPropertiesAxiom(towards, towardsBFO);
-//		
-//		manager.addAxiom(zp,ax1);
-//		manager.addAxiom(zp,ax2);
-//		manager.addAxiom(zp,ax3);
+		final OWLObjectProperty hasPart		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000051"));
+		
 		
 		// RO_0002180 = "qualifier"
 		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
@@ -232,6 +222,17 @@ public class ZP
 					if (! entry.isAbnormal)
 						return true;
 					
+					// FIXME debug: exclude useless annotation that look like this
+					// ...ZFA:0001439|anatomical system|||||||PATO:0000001|quality|abnormal|
+					if ( entry.entity1SupertermId.equals("ZFA:0001439") &&
+							entry.patoID.equals("PATO:0000001") &&
+							entry.entity1SubtermId.equals("") &&
+							entry.entity2SupertermId.equals("") &&
+							entry.entity2SubtermId.equals(""))
+						return true;
+					
+					
+					// set up the ID ... don't use different IDs for same classes
 					String zpId;
 					String entryStringRep = entry.getEntryAsStringOfIds();
 					if (entryIds2zpId.containsKey(entryStringRep)){
@@ -242,6 +243,8 @@ public class ZP
 						entryIds2zpId.put(entryStringRep, zpId);
 						id++;
 					}
+					
+					
 					
 					
 					OWLClass zpTerm 	= factory.getOWLClass(OBOVocabulary.ID2IRI(zpId));
@@ -304,8 +307,10 @@ public class ZP
 					/* Create intersection */
 					intersectionExpression = factory.getOWLObjectIntersectionOf(intersectionList);
 					
+					OWLClassExpression owlSomeClassExp = factory.getOWLObjectSomeValuesFrom(hasPart,intersectionExpression);
+					
 					/* Make term equivalent to the intersection */
-					OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, intersectionExpression);
+					OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, owlSomeClassExp);
 					manager.addAxiom(zp,axiom);
 
 					/* Add label */
@@ -313,6 +318,8 @@ public class ZP
 					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
 					manager.addAxiom(zp,labelAnnoAxiom);
 
+
+					
 					/*
 					 * Writing the annotation file
 					 */

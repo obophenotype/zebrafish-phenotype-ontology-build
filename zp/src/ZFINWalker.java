@@ -51,27 +51,33 @@ public class ZFINWalker
 		String line;
 		while ((line = in.readLine()) != null)
 		{
-			
-			ZFINEntry entry = new ZFINEntry();
-			
-			String [] sp = line.split("\\|");
-
-			entry.geneZfinID = sp[COLUMN_ZFIN_GENE_ID];
-
-			entry.entity1SupertermId 	= sp[COLUMN_TERM1_SUPERTERM_ID];
-			entry.entity1SupertermName 	= sp[COLUMN_TERM1_SUPERTERM_NAME];
-			entry.entity1SubtermId 		= sp[COLUMN_TERM1_SUBTERM_ID];
-			entry.entity1SubtermName 	= sp[COLUMN_TERM1_SUBTERM_NAME];
-			
-			entry.entity2SupertermId 	= sp[COLUMN_TERM2_SUPERTERM_ID];
-			entry.entity2SupertermName 	= sp[COLUMN_TERM2_SUPERTERM_NAME];
-			entry.entity2SubtermId 		= sp[COLUMN_TERM2_SUBTERM_ID];
-			entry.entity2SubtermName 	= sp[COLUMN_TERM2_SUBTERM_NAME];
-
-			entry.patoID 		= sp[COLUMN_PATO_ID];
-			entry.patoName 		= sp[COLUMN_PATO_NAME];
-			entry.isAbnormal 	= sp[COLUMN_PATO_ABNORMAL_NORMAL].equalsIgnoreCase("abnormal");
-			visitor.visit(entry);
+			try{
+				ZFINEntry entry = new ZFINEntry();
+				
+				String [] sp = line.split("\t");
+	
+				entry.geneZfinID = sp[COLUMN_ZFIN_GENE_ID];
+	
+				entry.entity1SupertermId 	= sp[COLUMN_TERM1_SUPERTERM_ID];
+				entry.entity1SupertermName 	= sp[COLUMN_TERM1_SUPERTERM_NAME];
+				entry.entity1SubtermId 		= sp[COLUMN_TERM1_SUBTERM_ID];
+				entry.entity1SubtermName 	= sp[COLUMN_TERM1_SUBTERM_NAME];
+				
+				entry.entity2SupertermId 	= sp[COLUMN_TERM2_SUPERTERM_ID];
+				entry.entity2SupertermName 	= sp[COLUMN_TERM2_SUPERTERM_NAME];
+				entry.entity2SubtermId 		= sp[COLUMN_TERM2_SUBTERM_ID];
+				entry.entity2SubtermName 	= sp[COLUMN_TERM2_SUBTERM_NAME];
+	
+				entry.patoID 		= sp[COLUMN_PATO_ID];
+				entry.patoName 		= sp[COLUMN_PATO_NAME];
+				entry.isAbnormal 	= sp[COLUMN_PATO_ABNORMAL_NORMAL].equalsIgnoreCase("abnormal");
+				visitor.visit(entry);
+			}
+			catch (Exception e) {
+				System.out.println("Problem in line: "+line);
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 	}
 }

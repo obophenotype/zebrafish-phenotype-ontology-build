@@ -53,8 +53,11 @@ public class ZFINWalker
 		{
 			try{
 				ZFINEntry entry = new ZFINEntry();
-				
-				String [] sp = line.split("\t");
+				String [] sp = null;
+				if (line.contains("|"))
+					sp = line.split("\\|");
+				else
+					sp = line.split("\t");
 	
 				entry.geneZfinID = sp[COLUMN_ZFIN_GENE_ID];
 	

@@ -270,13 +270,13 @@ public class ZP
 						
 						/* Note that is language the last word is the more specific part of the composition, i.e.,
 						 * we say swim bladder epithelium, which is the epithelium of the swim bladder  */
-						label = "abnormally " + entry.patoName +  " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
+						label = "abnormal(ly) " + entry.patoName +  " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
 					} 
 					else
 					{
 						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
 						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
-						label = "abnormally " + entry.patoName +  " " + entry.entity1SupertermName;
+						label = "abnormal(ly) " + entry.patoName +  " " + entry.entity1SupertermName;
 					}
 					
 					
@@ -324,7 +324,7 @@ public class ZP
 					 * Writing the annotation file
 					 */
 					try {
-						annotationOut.write(entry.geneZfinID+"\t"+zpId+"\n");
+						annotationOut.write(entry.geneZfinID+"\t"+zpId+"\t"+label+"\n");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

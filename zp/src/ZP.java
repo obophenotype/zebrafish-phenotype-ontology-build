@@ -56,17 +56,18 @@ public class ZP
 
 	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException, InterruptedException
 	{
-		
 		final CommandLineParser commandLineParser 	= new BasicParser();
-		HelpFormatter formatter 						= new HelpFormatter();
+		HelpFormatter formatter 					= new HelpFormatter();
 		final Options options 						= new Options();
 		
-		Option zfinFileOpt = new Option("z", "zfin", true, "ZFIN file! (http://zfin.org/data_transfer/Downloads/phenotype.txt)");
+		Option zfinFileOpt = new Option("z", "zfin-file", true, "The ZFIN file (e.g., http://zfin.org/data_transfer/Downloads/phenotype.txt)");
 		options.addOption(zfinFileOpt);
 		Option ontoFileOpt = new Option("o","ontology-file", true, "Where the ontology file (e.g. ZP.owl) is written to.");
 		options.addOption(ontoFileOpt);
 		Option annotFileOpt = new Option("a", "annotation-file", true, "Where the annotation file (e.g. ZP.annot) is written to.");
 		options.addOption(annotFileOpt);
+		Option keepOpt = new Option("k", "keep-ids", false, "If the file on the output is already a valid ZP.owl file, keep the ids (ZP_nnnnnnn) stored in that file.");
+		options.addOption(keepOpt);
 		Option help = new Option( "h", "help",false, "Print this (help-)message.");
 		options.addOption(help);
 		
@@ -75,42 +76,54 @@ public class ZP
 		/*
 		 * Check if user wants help how to use this program
 		 */
-		if (commandLine.hasOption(help.getOpt()) || commandLine.hasOption(help.getLongOpt())){
+		if (commandLine.hasOption(help.getOpt()) || commandLine.hasOption(help.getLongOpt()))
+		{
 			formatter.printHelp( ZP.class.getSimpleName() , options );
 			return;
 		}
 		
+		final String zfinFilePath  = getOption(zfinFileOpt, commandLine);
+		final String ontoFilePath  = getOption(ontoFileOpt, commandLine);
+		final String annotFilePath = getOption(annotFileOpt, commandLine);
+		boolean keepIds = commandLine.hasOption(keepOpt.getOpt());
 		
-		final String zfinFilePath 			= getOption(zfinFileOpt, commandLine);
-		final String ontoFilePath 			= getOption(ontoFileOpt, commandLine);
-		final String annotFilePath 			= getOption(annotFileOpt, commandLine);
 		// check that required parameters are set
 		String parameterError = null;
 		
-		if (zfinFilePath == null){
-			parameterError = "missing zfin file!";
-		}
-		else if (ontoFilePath == null){
-			parameterError = "no path to ontology-output-file provided!";
-		}
-		else if (annotFilePath == null){
-			parameterError = "no path to annotation-output-file provided!";
-		}
+		if (zfinFilePath == null) parameterError = "Required zfin-file is missing!";
+		else if (ontoFilePath == null) parameterError = "Required option ontology-output-file is missing!";
+		else if (annotFilePath == null) parameterError = "Required option annotation-output-file missing!";
+
 		/*
 		 * Maybe something was wrong with the parameter. Print help for 
 		 * the user and die here...
 		 */
-		if (parameterError != null){
+		if (parameterError != null)
+		{
 			String className = ZP.class.getSimpleName();
 			
 			formatter.printHelp(className, options);
 			throw new IllegalArgumentException(parameterError);
 		}
 		
-		
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/");
+
+		/* Load the previous zp */
+		OWLOntology preZP;
+		File ontoFile = new File(ontoFilePath);
+		if (ontoFile.exists())
+		{
+			preZP = manager.loadOntologyFromOntologyDocument(ontoFile);
+		} else
+		{
+			log.info("Ignoring non-existent file \""+ ontoFilePath + "\" for keeping the ids");
+			preZP = null;
+		}
+		
+		/* Instanciate the zpid db */
+		final ZPIDDB zpIdDB = new ZPIDDB(preZP);
 
 		/* Now create the zp ontology */
 		final OWLOntology zp = manager.createOntology(zpIRI);
@@ -125,7 +138,7 @@ public class ZP
 		File f = new File(zfinFilePath);
 		if (f.isDirectory())
 		{
-			System.err.println("Input file must be a file (as the name suggests) and not a directory.");
+			System.err.println(String.format("Specified zfin parameter value \"%s\" must point to a file (as the name suggests) and not a directory.",zfinFilePath));
 			System.exit(-1);
 		}
 		
@@ -135,15 +148,12 @@ public class ZP
 			System.exit(-1);
 		}
 		
-		
 		File of = new File(ontoFilePath);
 
-		
-		final OWLObjectProperty towards 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
+		final OWLObjectProperty towards 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		final OWLObjectProperty partOf 		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
 		final OWLObjectProperty inheresIn	= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
 		final OWLObjectProperty hasPart		= factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000051"));
-		
 		
 		// RO_0002180 = "qualifier"
 		final OWLObjectProperty qualifier 	= factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
@@ -177,13 +187,6 @@ public class ZP
 			 * collate the classes properly. We also emit the annotations here. */
 			ZFINWalker.walk(is, new ZFINVisitor()
 			{
-				
-				/**
-				 * This stores someting like 
-				 */
-				HashMap<String, String> entryIds2zpId = new HashMap<String, String>();
-				int id = 1;
-				
 				/**
 				 * Returns an entity class for the given obo id. This is a simple wrapper
 				 * for OBOVocabulary.ID2IRI(id) but checks whether the term stems from
@@ -217,11 +220,10 @@ public class ZP
 
 				public boolean visit(ZFINEntry entry)
 				{
-					
 					// handle only abnormal entries
 					if (! entry.isAbnormal)
 						return true;
-					
+
 					// FIXME debug: exclude useless annotation that look like this
 					// ...ZFA:0001439|anatomical system|||||||PATO:0000001|quality|abnormal|
 					if ( entry.entity1SupertermId.equals("ZFA:0001439") &&
@@ -232,22 +234,6 @@ public class ZP
 						return true;
 					
 					
-					// set up the ID ... don't use different IDs for same classes
-					String zpId;
-					String entryStringRep = entry.getEntryAsStringOfIds();
-					if (entryIds2zpId.containsKey(entryStringRep)){
-						zpId 		= entryIds2zpId.get(entryStringRep);
-					}
-					else{
-						zpId 		= String.format("ZP:%07d",id);
-						entryIds2zpId.put(entryStringRep, zpId);
-						id++;
-					}
-					
-					
-					
-					
-					OWLClass zpTerm 	= factory.getOWLClass(OBOVocabulary.ID2IRI(zpId));
 					OWLClass pato 	= getQualiClassForOBOID(entry.patoID);
 					OWLClass cl1 	= getEntityClassForOBOID(entry.entity1SupertermId);
 					OWLClassExpression intersectionExpression;
@@ -309,6 +295,10 @@ public class ZP
 					
 					OWLClassExpression owlSomeClassExp = factory.getOWLObjectSomeValuesFrom(hasPart,intersectionExpression);
 					
+					IRI zpIRI = zpIdDB.getZPId(owlSomeClassExp);
+					String zpID = OBOVocabulary.IRI2ID(zpIRI);
+					OWLClass zpTerm 	= factory.getOWLClass(zpIRI);
+
 					/* Make term equivalent to the intersection */
 					OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, owlSomeClassExp);
 					manager.addAxiom(zp,axiom);
@@ -318,13 +308,11 @@ public class ZP
 					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
 					manager.addAxiom(zp,labelAnnoAxiom);
 
-
-					
 					/*
 					 * Writing the annotation file
 					 */
 					try {
-						annotationOut.write(entry.geneZfinID+"\t"+zpId+"\t"+label+"\n");
+						annotationOut.write(entry.geneZfinID+"\t"+zpID+"\t"+label+"\n");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

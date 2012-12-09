@@ -81,6 +81,7 @@ public class ZPIDDB
 					class2Id.put(cl2, zpIRI);
 				}
 			}
+			log.info((nextId - 1) + " previous ids recovered");
 		}
 	}
 

@@ -1,9 +1,10 @@
+package de.sonumina.zp;
 
 /**
  * A simple zfin entry.
  * 
  * @author Sebastian Bauer
- * @author Sebastian Kšhler
+ * @author Sebastian Koehler
  */
 public class ZFINEntry
 {

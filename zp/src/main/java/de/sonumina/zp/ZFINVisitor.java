@@ -1,3 +1,5 @@
+package de.sonumina.zp;
+
 public interface ZFINVisitor
 {
 	/**

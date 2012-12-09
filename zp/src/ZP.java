@@ -110,24 +110,27 @@ public class ZP
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/");
 
-		/* Load the previous zp */
-		OWLOntology preZP;
-		File ontoFile = new File(ontoFilePath);
-		if (ontoFile.exists())
+		/* Load the previous zp, if requested */
+		final OWLOntology zp;
+		if (keepIds)
 		{
-			preZP = manager.loadOntologyFromOntologyDocument(ontoFile);
+			File ontoFile = new File(ontoFilePath);
+			if (ontoFile.exists())
+			{
+				zp = manager.loadOntologyFromOntologyDocument(ontoFile);
+			} else
+			{
+				log.info("Ignoring non-existent file \""+ ontoFilePath + "\" for keeping the ids");
+				zp = manager.createOntology(zpIRI);
+			}
 		} else
 		{
-			log.info("Ignoring non-existent file \""+ ontoFilePath + "\" for keeping the ids");
-			preZP = null;
+			zp = manager.createOntology(zpIRI);
 		}
 		
 		/* Instanciate the zpid db */
-		final ZPIDDB zpIdDB = new ZPIDDB(preZP);
+		final ZPIDDB zpIdDB = new ZPIDDB(zp);
 
-		/* Now create the zp ontology */
-		final OWLOntology zp = manager.createOntology(zpIRI);
-		
 		/* Where to write the annotation file to */
 		final BufferedWriter annotationOut = new BufferedWriter(new FileWriter(annotFilePath));
 		
@@ -322,6 +325,7 @@ public class ZP
 			});
 
 			manager.saveOntology(zp, new FileOutputStream(of));
+			log.info("Wrote \"" + of.toString() + "\"");
 			annotationOut.close();
 		} 
 		catch (FileNotFoundException e)

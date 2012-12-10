@@ -1,4 +1,4 @@
-package de.sonumina.zp;
+package de.sonumina.zpgen;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -50,11 +50,11 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
  * @author Sebastian Bauer
  * @author Sebastian Koehler
  */
-public class ZP
+public class ZPGen
 {
 	static boolean verbose = true;
 
-	static Logger log = Logger.getLogger(ZP.class.getName());
+	static Logger log = Logger.getLogger(ZPGen.class.getName());
 
 	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException, InterruptedException
 	{
@@ -80,7 +80,7 @@ public class ZP
 		 */
 		if (commandLine.hasOption(help.getOpt()) || commandLine.hasOption(help.getLongOpt()))
 		{
-			formatter.printHelp( ZP.class.getSimpleName() , options );
+			formatter.printHelp( ZPGen.class.getSimpleName() , options );
 			return;
 		}
 		
@@ -102,7 +102,7 @@ public class ZP
 		 */
 		if (parameterError != null)
 		{
-			String className = ZP.class.getSimpleName();
+			String className = ZPGen.class.getSimpleName();
 			
 			formatter.printHelp(className, options);
 			throw new IllegalArgumentException(parameterError);

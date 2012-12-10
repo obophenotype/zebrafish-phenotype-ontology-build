@@ -1,4 +1,4 @@
-package de.sonumina.zp;
+package de.sonumina.zpgen;
 
 public interface ZFINVisitor
 {

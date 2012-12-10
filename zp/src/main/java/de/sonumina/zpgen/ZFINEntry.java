@@ -1,4 +1,4 @@
-package de.sonumina.zp;
+package de.sonumina.zpgen;
 
 /**
  * A simple zfin entry.

@@ -2,8 +2,6 @@ package de.sonumina.zpgen;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.StringWriter;
 
 import junit.framework.Assert;
 

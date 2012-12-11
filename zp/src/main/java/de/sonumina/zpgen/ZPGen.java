@@ -46,7 +46,7 @@ public class ZPGen
 
 	public static void main(String[] args) throws OWLOntologyCreationException, IOException, InterruptedException
 	{
-		ZPCLIConfig zpCLIConfig = new ZPCLIConfig();
+		ZPGenCLIConfig zpCLIConfig = new ZPGenCLIConfig();
 		JCommander jc = new JCommander(zpCLIConfig);
 		jc.parse(args);
 		

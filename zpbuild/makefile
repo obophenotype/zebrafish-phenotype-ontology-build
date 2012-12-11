@@ -6,13 +6,13 @@
 
 ZPGEN_JAR = ../zpgen/target/zp-0.1-SNAPSHOT-jar-with-dependencies.jar
 ZPGEN =java -jar $(ZPGEN_JAR)
-OORT =java -jar owltools-oort-all.jar
+OWLTOOLS =java -jar owltools-runner-all.jar
 
 # where external ontologies are stored locally
 EXTERNAL?=external
 
 .PHONY: all
-all: zp-axioms.owl
+all: zp.owl
 
 .PHONY: phenotype.txt
 phenotype.txt:
@@ -24,7 +24,7 @@ zp-axioms.owl: phenotype.txt $(ZPGEN_JAR)
 zp.owl: zp-axioms.owl
 	mkdir -p $(EXTERNAL)
 	cd $(EXTERNAL) ; cat ../external_ontologies | sed "/^#.*$$/d" | wget --retry-connrefused -N -i -
-#	$(OORT) $< external/go.obo -outdir release
+	$(OWLTOOLS) zp-axioms.owl external/go.obo external/zfa.obo external/pato.obo --merge-support-ontologies --elk --run-reasoner --assert-implied --reasoner-query -c zp -d ZP_0000001 --output file://$(shell pwd)/$@ >/dev/zero
 
 .PHONY: $(ZPGEN_JAR)
 $(ZPGEN_JAR):

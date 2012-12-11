@@ -13,13 +13,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.coode.owlapi.obo.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -35,6 +28,8 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import com.beust.jcommander.JCommander;
+
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from
  * decomposed phenotype - gene associations.
@@ -47,60 +42,26 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
  */
 public class ZPGen
 {
-	static Logger log = Logger.getLogger(ZPGen.class.getName());
+	static private Logger log = Logger.getLogger(ZPGen.class.getName());
 
-	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException, InterruptedException
+	public static void main(String[] args) throws OWLOntologyCreationException, IOException, InterruptedException
 	{
-		final CommandLineParser commandLineParser 	= new BasicParser();
-		HelpFormatter formatter 					= new HelpFormatter();
-		final Options options 						= new Options();
+		ZPCLIConfig zpCLIConfig = new ZPCLIConfig();
+		JCommander jc = new JCommander(zpCLIConfig);
+		jc.parse(args);
 		
-		Option zfinFileOpt = new Option("z", "zfin-file", true, "The ZFIN file (e.g., http://zfin.org/data_transfer/Downloads/phenotype.txt)");
-		options.addOption(zfinFileOpt);
-		Option ontoFileOpt = new Option("o","ontology-file", true, "Where the ontology file (e.g. ZP.owl) is written to.");
-		options.addOption(ontoFileOpt);
-		Option annotFileOpt = new Option("a", "annotation-file", true, "Where the annotation file (e.g. ZP.annot) is written to.");
-		options.addOption(annotFileOpt);
-		Option keepOpt = new Option("k", "keep-ids", false, "If the file on the output is already a valid ZP.owl file, keep the ids (ZP_nnnnnnn) stored in that file.");
-		options.addOption(keepOpt);
-		Option help = new Option( "h", "help",false, "Print this (help-)message.");
-		options.addOption(help);
-		
-		final CommandLine commandLine 	= commandLineParser.parse(options, args);
-
-		/*
-		 * Check if user wants help how to use this program
-		 */
-		if (commandLine.hasOption(help.getOpt()) || commandLine.hasOption(help.getLongOpt()))
+		jc.setProgramName(ZPGen.class.getSimpleName());
+		if (zpCLIConfig.help)
 		{
-			formatter.printHelp( ZPGen.class.getSimpleName() , options );
-			return;
+			jc.usage();
+			System.exit(0);
 		}
 		
-		final String zfinFilePath  = getOption(zfinFileOpt, commandLine);
-		final String ontoFilePath  = getOption(ontoFileOpt, commandLine);
-		final String annotFilePath = getOption(annotFileOpt, commandLine);
-		boolean keepIds = commandLine.hasOption(keepOpt.getOpt());
-		
-		// check that required parameters are set
-		String parameterError = null;
-		
-		if (zfinFilePath == null) parameterError = "Required zfin-file is missing!";
-		else if (ontoFilePath == null) parameterError = "Required option ontology-output-file is missing!";
-		else if (annotFilePath == null) parameterError = "Required option annotation-output-file missing!";
-
-		/*
-		 * Maybe something was wrong with the parameter. Print help for 
-		 * the user and die here...
-		 */
-		if (parameterError != null)
-		{
-			String className = ZPGen.class.getSimpleName();
-			
-			formatter.printHelp(className, options);
-			throw new IllegalArgumentException(parameterError);
-		}
-		
+		final String zfinFilePath  = zpCLIConfig.zfinFilePath;
+		final String ontoFilePath  = zpCLIConfig.ontoFilePath;
+		final String annotFilePath = zpCLIConfig.annotFilePath;
+		boolean keepIds = zpCLIConfig.keepIds;
+				
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/");
@@ -337,19 +298,5 @@ public class ZPGen
 		catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	
-
-	public static String getOption(Option opt, final CommandLine commandLine) {
-
-		if (commandLine.hasOption(opt.getOpt())) {
-			return commandLine.getOptionValue(opt.getOpt());
-		}
-		if (commandLine.hasOption(opt.getLongOpt())) {
-			return commandLine.getOptionValue(opt.getLongOpt());
-		}
-		return null;
-	}
-	
+	}	
 }

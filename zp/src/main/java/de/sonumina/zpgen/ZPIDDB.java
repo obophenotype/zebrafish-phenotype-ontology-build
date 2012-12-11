@@ -25,7 +25,7 @@ public class ZPIDDB
 	/** Next id to be assigned in case of an unknown class expression */
 	private int nextId = 1;
 
-	/** Every class expression got's an own distinct id, which is stored here */
+	/** Every class expression gets an own distinct id, which is stored here */
 	private HashMap<OWLClassExpression,IRI> class2Id = new HashMap<OWLClassExpression,IRI>();
 
 	/**

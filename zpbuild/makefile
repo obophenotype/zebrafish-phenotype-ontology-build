@@ -18,7 +18,7 @@ all: zp-axioms.owl
 phenotype.txt:
 	wget -N http://zfin.org/downloads/phenotype.txt
 
-zp-axioms.owl: phenotype.txt
+zp-axioms.owl: phenotype.txt $(ZPGEN_JAR)
 	$(ZPGEN) -z $< -a zp.annot -o $@ -k
 
 zp.owl: zp-axioms.owl

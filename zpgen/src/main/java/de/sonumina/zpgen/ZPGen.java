@@ -251,7 +251,7 @@ public class ZPGen
 							label += " towards " + entry.entity2SupertermName;
 						}
 					}
-						
+
 					/* Create intersection */
 					intersectionExpression = factory.getOWLObjectIntersectionOf(intersectionList);
 					
@@ -284,6 +284,18 @@ public class ZPGen
 			}
 			
 			ZFIN zfinVisitor = new ZFIN();
+			
+			/* The zp entry that defines the root */
+			ZFINEntry rootEntry = new ZFINEntry();
+			rootEntry.geneZfinID = "DUMMY";
+			rootEntry.isAbnormal = true;
+			rootEntry.patoID = "PATO:0000001";
+			rootEntry.patoName = "quality";
+			rootEntry.entity1SupertermId = "ZFA:0100000";
+			rootEntry.entity1SupertermName = "zebrafish anatomical entity";
+			rootEntry.entity2SupertermId = "";
+			zfinVisitor.visit(rootEntry);
+			
 			ZFINWalker.walk(is,zfinVisitor);
 
 			manager.saveOntology(zp, new FileOutputStream(of));

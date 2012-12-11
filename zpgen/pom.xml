@@ -56,7 +56,7 @@
       </descriptorRefs>
       <archive>
        <manifest>
-        <mainClass>de.sonumina.zp.ZP</mainClass>
+        <mainClass>de.sonumina.zpgen.ZPGen</mainClass>
        </manifest>
       </archive>
      </configuration>

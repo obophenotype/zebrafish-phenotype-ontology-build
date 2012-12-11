@@ -24,7 +24,7 @@ zp-axioms.owl: phenotype.txt $(ZPGEN_JAR)
 zp.owl: zp-axioms.owl
 	mkdir -p $(EXTERNAL)
 	cd $(EXTERNAL) ; cat ../external_ontologies | sed "/^#.*$$/d" | wget --retry-connrefused -N -i -
-	$(OWLTOOLS) zp-axioms.owl external/go.obo external/zfa.obo external/pato.obo --merge-support-ontologies --elk --run-reasoner --assert-implied --reasoner-query -c zp -d ZP_0000001 --output file://$(shell pwd)/$@ >/dev/zero
+	$(OWLTOOLS) zp-axioms.owl external/go.obo external/zfa.obo external/pato.obo --merge-support-ontologies --elk --run-reasoner --assert-implied --reasoner-query -c zp -d ZP_0000001 --make-ontology-from-results zp --output file://$(shell pwd)/$@ >/dev/zero
 
 .PHONY: $(ZPGEN_JAR)
 $(ZPGEN_JAR):

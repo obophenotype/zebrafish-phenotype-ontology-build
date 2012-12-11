@@ -41,15 +41,12 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
  * 
  * The purpose of this tool is to create an ontology from the definition that
  * can be found in this file (source http://zfin.org/data_transfer/Downloads/phenotype.txt).
- * The input file is tab separated.
  *  
  * @author Sebastian Bauer
  * @author Sebastian Koehler
  */
 public class ZPGen
 {
-	static boolean verbose = true;
-
 	static Logger log = Logger.getLogger(ZPGen.class.getName());
 
 	public static void main(String[] args) throws OWLOntologyCreationException, IOException, ParseException, InterruptedException

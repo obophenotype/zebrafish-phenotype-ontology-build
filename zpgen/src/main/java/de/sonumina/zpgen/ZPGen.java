@@ -147,7 +147,7 @@ public class ZPGen
 
 			/* Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to
 			 * collate the classes properly. We also emit the annotations here. */
-			ZFINWalker.walk(is, new ZFINVisitor()
+			class ZFIN implements ZFINVisitor
 			{
 				/**
 				 * Returns an entity class for the given obo id. This is a simple wrapper
@@ -281,7 +281,10 @@ public class ZPGen
 					
 					return true;
 				}
-			});
+			}
+			
+			ZFIN zfinVisitor = new ZFIN();
+			ZFINWalker.walk(is,zfinVisitor);
 
 			manager.saveOntology(zp, new FileOutputStream(of));
 			log.info("Wrote \"" + of.toString() + "\"");

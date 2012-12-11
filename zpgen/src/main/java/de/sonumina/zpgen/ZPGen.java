@@ -64,7 +64,7 @@ public class ZPGen
 				
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/");
+		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/zp");
 
 		/* Load the previous zp, if requested */
 		final OWLOntology zp;

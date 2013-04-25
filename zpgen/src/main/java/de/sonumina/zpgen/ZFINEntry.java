@@ -4,7 +4,7 @@ package de.sonumina.zpgen;
  * A simple zfin entry.
  * 
  * @author Sebastian Bauer
- * @author Sebastian Koehler
+ * @author Sebastian Koehler 12
  */
 public class ZFINEntry
 {

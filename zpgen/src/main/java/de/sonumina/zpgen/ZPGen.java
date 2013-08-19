@@ -17,11 +17,15 @@ import org.coode.owlapi.obo.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -57,6 +61,7 @@ public class ZPGen
 			System.exit(0);
 		}
 		
+		final boolean addSourceInformation = zpCLIConfig.addSourceInformation || zpCLIConfig.sourceInformationFile != null;
 		final String zfinFilePath  = zpCLIConfig.zfinFilePath;
 		final String ontoFilePath  = zpCLIConfig.ontoFilePath;
 		final String annotFilePath = zpCLIConfig.annotFilePath;
@@ -269,6 +274,11 @@ public class ZPGen
 					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),factory.getOWLLiteral(label));
 					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
 					manager.addAxiom(zp,labelAnnoAxiom);
+					
+					/* Add source information */
+					if (addSourceInformation) {
+						addSourceInformation(zpTerm, entry, zp);
+					}
 
 					/*
 					 * Writing the annotation file
@@ -301,6 +311,9 @@ public class ZPGen
 			manager.saveOntology(zp, new FileOutputStream(of));
 			log.info("Wrote \"" + of.toString() + "\"");
 			annotationOut.close();
+			if (zpCLIConfig.sourceInformationFile != null) {
+				saveSourceInformation(zp, zpCLIConfig.sourceInformationFile);
+			}
 		} 
 		catch (FileNotFoundException e)
 		{
@@ -313,5 +326,124 @@ public class ZPGen
 		catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
+	
+	/**
+	 * Custom IRI for the annotation property for the definition of the class expression. 
+	 */
+	static final IRI definitionSourcePropertyIRI = IRI.create("http://zfin/definition/source_information");
+	
+	/**
+	 * Add the source information for the definition of the equivalent class
+	 * expression for the given ZP class.
+	 * 
+	 * @param cls
+	 * @param entry
+	 * @param zp
+	 */
+	private static void addSourceInformation(OWLClass cls, ZFINEntry entry, OWLOntology zp) {
+		OWLOntologyManager m = zp.getOWLOntologyManager();
+		OWLDataFactory f = m.getOWLDataFactory();
+		OWLAnnotationProperty definitionSourceProperty = f.getOWLAnnotationProperty(definitionSourcePropertyIRI);
+		
+		// search for existing source information
+		Set<OWLAnnotationAssertionAxiom> annotations = zp.getAnnotationAssertionAxioms(cls.getIRI());
+		boolean hasSourceInformation = false;
+		for (OWLAnnotationAssertionAxiom ann : annotations) {
+			if (definitionSourceProperty.equals(ann.getProperty())) {
+				hasSourceInformation = true;
+				break;
+			}
+		}
+		// only add new information if no previous one exists
+		if (hasSourceInformation == false) {
+			StringBuilder source = new StringBuilder();
+			source.append(entry.entity1SupertermId); 	// affected_structure_or_process_1_superterm_id
+			source.append('\t');
+			if (entry.entity1SubtermId != null) {
+				source.append(entry.entity1SubtermId); 	// affected_structure_or_process_1_subterm_id
+			}
+			source.append('\t');
+			source.append(entry.patoID); 				// phenotype_keyword_id
+			source.append('\t');
+			source.append("PATO:0000460");				// phenotype_modifier, currently always abnormal
+			source.append('\t');
+			if (entry.entity2SupertermId != null) {
+				source.append(entry.entity2SupertermId);// affected_structure_or_process_2_superterm_id
+			}
+			source.append('\t');
+			if (entry.entity2SubtermId != null) {
+				source.append(entry.entity2SubtermId); 	// affected_structure_or_process_2_subterm_id
+			}
+			OWLAnnotation sourceAnno = f.getOWLAnnotation(definitionSourceProperty, f.getOWLLiteral(source.toString()));
+			OWLAxiom labelAnnoAxiom = f.getOWLAnnotationAssertionAxiom(cls.getIRI(), sourceAnno);
+			m.addAxiom(zp, labelAnnoAxiom);
+		}
+	}
+	
+	/**
+	 * Save the source information for all ZP classes in a separate file.
+	 * 
+	 * @param zp
+	 * @param fileName
+	 */
+	private static void saveSourceInformation(OWLOntology zp, String fileName) {
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(fileName));
+			OWLOntologyManager m = zp.getOWLOntologyManager();
+			OWLDataFactory f = m.getOWLDataFactory();
+			OWLAnnotationProperty definitionSourceProperty = f.getOWLAnnotationProperty(definitionSourcePropertyIRI);
+			OWLAnnotationProperty rdfsLabel = f.getRDFSLabel();
+			for(OWLClass cls : zp.getClassesInSignature()) {
+				String zpID = OBOVocabulary.IRI2ID(cls.getIRI());
+				if (zpID.startsWith("ZP:") == false) {
+					// Ignore non ZP classes
+					continue;
+				}
+				String label = null;
+				String source = null;
+				
+				// Check annotations for source information and label
+				Set<OWLAnnotationAssertionAxiom> annotations = zp.getAnnotationAssertionAxioms(cls.getIRI());
+				for (OWLAnnotationAssertionAxiom ann : annotations) {
+					OWLAnnotationProperty prop = ann.getProperty();
+					if (definitionSourceProperty.equals(prop)) {
+						OWLAnnotationValue value = ann.getValue();
+						if (value instanceof OWLLiteral) {
+							source = ((OWLLiteral)value).getLiteral();
+						}
+						break;
+					}
+					else if (rdfsLabel.equals(prop)) {
+						OWLAnnotationValue value = ann.getValue();
+						if (value instanceof OWLLiteral) {
+							label = ((OWLLiteral)value).getLiteral();
+						}
+					}
+				}
+				
+				// write the information
+				if (label != null && source != null) {
+					writer.append(zpID);
+					writer.append('\t');
+					writer.append(label);
+					writer.append('\t');
+					writer.append(source);
+					writer.append('\n');
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					// close quietly
+				}
+			}
+		}
+	}
 }

@@ -21,6 +21,12 @@ public class ZPGenCLIConfig
 	@Parameter(names={"-k","--keep-ids"},required=false,description="If the output ontology file is already valid, keep the ids (ZP_nnnnnnn) stored in that file.")
 	public boolean keepIds = false;
 	
+	@Parameter(names={"--add-source-information"},required=false,description="If set to true, add a tab delimited source information for the class expression to the ontology.")
+	public boolean addSourceInformation = false;
+	
+	@Parameter(names={"-s","--source-information-output-file"},required=false,description="Add the source information to the ontology and save is also in a separate file. Implies --add-source-information set to true.")
+	public String sourceInformationFile = null;
+	
 	@Parameter(names={"-h","--help"},help=true,description="Shows this help")
 	public boolean help;
 }

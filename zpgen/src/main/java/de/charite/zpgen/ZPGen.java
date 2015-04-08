@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -60,9 +61,12 @@ public class ZPGen {
 
 		final boolean addSourceInformation = zpCLIConfig.addSourceInformation || zpCLIConfig.sourceInformationFile != null;
 		final String zfinFilePath = zpCLIConfig.zfinFilePath;
-		final String ontoFilePath = zpCLIConfig.ontoFilePath;
+		final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
 		final String annotFilePath = zpCLIConfig.annotFilePath;
-		boolean keepIds = zpCLIConfig.keepIds;
+		final boolean keepIds = zpCLIConfig.keepIds;
+
+		final boolean addZfaUberonEquivalencies = zpCLIConfig.addZfaUberonEquivalencies;
+		final String uberonOboFilePath = zpCLIConfig.uberonOboFilePath;
 
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -71,17 +75,36 @@ public class ZPGen {
 		/* Load the previous zp, if requested */
 		final OWLOntology zp;
 		if (keepIds) {
-			File ontoFile = new File(ontoFilePath);
+			File ontoFile = new File(ontologyOutputFilePath);
 			if (ontoFile.exists()) {
 				zp = manager.loadOntologyFromOntologyDocument(ontoFile);
 			}
 			else {
-				log.info("Ignoring non-existent file \"" + ontoFilePath + "\" for keeping the ids");
-				zp = manager.createOntology(zpIRI);
+				// log.info("Ignoring non-existent file \"" + ontologyOutputFilePath + "\" for keeping the ids");
+				// zp = manager.createOntology(zpIRI);
+				log.info("Could not find file \"" + ontologyOutputFilePath + "\" for keeping the ids");
+				throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \"" + ontologyOutputFilePath
+						+ "\" was found! Prefer to stop here...");
 			}
 		}
 		else {
 			zp = manager.createOntology(zpIRI);
+		}
+
+		/*
+		 * If user wants to have equivalence axioms between ZFA-classes and UBERON-classes we need the uberon.obo to create a mapping here.
+		 */
+		HashMap<String, String> zfa2uberon = null;
+		if (addZfaUberonEquivalencies) {
+
+			File uberonOntoFile = new File(uberonOboFilePath);
+			if (!uberonOntoFile.exists()) {
+				log.info("Could not find file \"" + uberonOboFilePath + "\" for creating the ZFA-UBERON-mapping.");
+				throw new IllegalArgumentException("ZFA-UBERON-mapping requested, but no uberon.obo file \"" + uberonOboFilePath
+						+ "\" was found! Prefer to stop here...");
+			}
+			Zfa2UberonMapper zfa2uberonMapper = new Zfa2UberonMapper(uberonOboFilePath);
+			zfa2uberon = zfa2uberonMapper.getZfa2UberonMapping();
 		}
 
 		/* Instanciate the zpid db */
@@ -105,8 +128,6 @@ public class ZPGen {
 			System.err.println(String.format("Specified file \"%s\" doesn't exist!", zfinFilePath));
 			System.exit(-1);
 		}
-
-		File of = new File(ontoFilePath);
 
 		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
@@ -295,6 +316,8 @@ public class ZPGen {
 
 			ZFINWalker.walk(is, zfinVisitor);
 
+			/* Write output files */
+			File of = new File(ontologyOutputFilePath);
 			manager.saveOntology(zp, new FileOutputStream(of));
 			log.info("Wrote \"" + of.toString() + "\"");
 			annotationOut.close();

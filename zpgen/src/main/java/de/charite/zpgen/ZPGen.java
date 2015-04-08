@@ -1,4 +1,4 @@
-package de.sonumina.zpgen;
+package de.charite.zpgen;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,6 +42,7 @@ import com.beust.jcommander.JCommander;
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
+ * @author Heiko Dietze
  */
 public class ZPGen {
 	static private Logger log = Logger.getLogger(ZPGen.class.getName());

@@ -1,4 +1,4 @@
-package de.sonumina.zpgen;
+package de.charite.zpgen;
 
 import java.io.BufferedReader;
 import java.io.IOException;

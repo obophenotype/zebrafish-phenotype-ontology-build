@@ -1,4 +1,4 @@
-package de.sonumina.zpgen;
+package de.charite.zpgen;
 
 public interface ZFINVisitor
 {

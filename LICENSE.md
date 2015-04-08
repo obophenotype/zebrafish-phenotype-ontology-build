@@ -1,4 +1,4 @@
-Copyright (c) 2015, Sebastian Bauer, Heiko Dietze, Sebastian Köhler
+Copyright (c) 2015, Sebastian Bauer, Heiko Dietze, Sebastian Köhler, 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

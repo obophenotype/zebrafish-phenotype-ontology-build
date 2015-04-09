@@ -159,7 +159,7 @@ public class ZPGen {
 
 		/* RO_0002180 = "has qualifier" (previously used) */
 		/* RO_0002573 = "has modifier" (used in most recent version) */
-		final OWLObjectProperty has_qualifier = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
+		// final OWLObjectProperty has_qualifier = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
 		final OWLObjectProperty has_modifier = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002573"));
 		final OWLClass abnormal = factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
 

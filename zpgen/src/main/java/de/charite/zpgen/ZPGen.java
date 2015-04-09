@@ -66,6 +66,7 @@ public class ZPGen {
 		final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
 		final String annotFilePath = zpCLIConfig.annotFilePath;
 		final boolean keepIds = zpCLIConfig.keepIds;
+		final boolean useInheresInPartOf = zpCLIConfig.useInheresInPartOf;
 
 		final boolean addZfaUberonEquivalencies = zpCLIConfig.addZfaUberonEquivalencies;
 		final String uberonOboFilePath = zpCLIConfig.uberonOboFilePath;
@@ -137,10 +138,23 @@ public class ZPGen {
 			System.exit(-1);
 		}
 
-		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
+		// not sure which one to use RO_0002503 or BFO_0000070 ??
+		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002503"));
+
 		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
-		// XXX TODO ... think about this!
-		final OWLObjectProperty inheresIn = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
+
+		// I have for now replaced the BFO-properties with the RO-properties
+		final OWLObjectProperty inheresProperty;
+		if (useInheresInPartOf) {
+			// inheres in part of
+			inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002314"));
+		}
+		else {
+			// inheres in
+			inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0000052"));
+			// inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
+		}
+
 		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000051"));
 
 		/* RO_0002180 = "has qualifier" (previously used) */
@@ -234,7 +248,7 @@ public class ZPGen {
 						/* Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal */
 						OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
 
-						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn,
+						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresProperty,
 								factory.getOWLObjectIntersectionOf(cl2, factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
 
 						/*
@@ -245,7 +259,7 @@ public class ZPGen {
 					}
 					else {
 						/* Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal */
-						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresIn, cl1));
+						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresProperty, cl1));
 						label = "abnormal(ly) " + entry.patoName + " " + entry.entity1SupertermName;
 					}
 

@@ -63,6 +63,7 @@ public class ZPGen {
 
 		final boolean addSourceInformation = zpCLIConfig.addSourceInformation || zpCLIConfig.sourceInformationFile != null;
 		final String zfinFilePath = zpCLIConfig.zfinFilePath;
+		final String previousOntologyFilePath = zpCLIConfig.previousOntologyFilePath;
 		final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
 		final String annotFilePath = zpCLIConfig.annotFilePath;
 		final boolean keepIds = zpCLIConfig.keepIds;
@@ -78,15 +79,15 @@ public class ZPGen {
 		/* Load the previous zp, if requested */
 		final OWLOntology zp;
 		if (keepIds) {
-			File ontoFile = new File(ontologyOutputFilePath);
+			File ontoFile = new File(previousOntologyFilePath);
 			if (ontoFile.exists()) {
 				zp = manager.loadOntologyFromOntologyDocument(ontoFile);
 			}
 			else {
 				// log.info("Ignoring non-existent file \"" + ontologyOutputFilePath + "\" for keeping the ids");
 				// zp = manager.createOntology(zpIRI);
-				log.severe("Could not find file \"" + ontologyOutputFilePath + "\" for keeping the ids");
-				throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \"" + ontologyOutputFilePath
+				log.severe("Could not find file \"" + previousOntologyFilePath + "\" for keeping the ids");
+				throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \"" + previousOntologyFilePath
 						+ "\" was found! Prefer to stop here...");
 			}
 		}

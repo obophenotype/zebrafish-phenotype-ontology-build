@@ -11,6 +11,9 @@ public class ZPGenCLIConfig {
 	@Parameter(names = { "-z", "--zfin-input-file" }, required = true, description = "The file containing the decomposed phenotype - gene associations (e.g., http://zfin.org/data_transfer/Downloads/phenotype.txt)")
 	public String zfinFilePath;
 
+	@Parameter(names = { "-p", "--previous-ontology-file" }, required = true, description = "The last version of the ontology. Used to keep IDs!!!")
+	public String previousOntologyFilePath;
+
 	@Parameter(names = { "-o", "--ontology-output-file" }, required = true, description = "Where the ontology file (e.g. ZP.owl) is written to")
 	public String ontologyOutputFilePath;
 

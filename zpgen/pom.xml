@@ -19,20 +19,29 @@
   
   <dependencies>
    <dependency>
-    <groupId>owlapi</groupId>
-    <artifactId>owlapi</artifactId>
-    <version>3.2.4</version>
-   </dependency>
-   <dependency>
     <groupId>junit</groupId>
     <artifactId>junit</artifactId>
-    <version>4.10</version>
     <scope>test</scope>
    </dependency>
    <dependency>
     <groupId>com.beust</groupId>
     <artifactId>jcommander</artifactId>
     <version>1.30</version>
+   </dependency>
+  <dependency>
+	<groupId>net.sourceforge.owlapi</groupId>
+	<artifactId>owlapi-distribution</artifactId>
+	<version>3.5.2</version>
+  </dependency>
+  <dependency>
+	<groupId>com.google.guava</groupId>
+	<artifactId>guava</artifactId>
+	<version>18.0</version>
+   </dependency>
+   <dependency>
+   	<groupId>net.sf.trove4j</groupId>
+   	<artifactId>trove4j</artifactId>
+   	<version>3.0.3</version>
    </dependency>
   </dependencies>
 
@@ -69,4 +78,13 @@
     </plugin>
    </plugins>
   </build>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>4.10</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
 </project>

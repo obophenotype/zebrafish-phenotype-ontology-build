@@ -19,3 +19,6 @@ Two-level approach
     * Propagate obsolete ids
     * Propagate consider ids
     * Propagate other relations
+
+# Usage #
+This project is used as part of the monarch initiative (http://monarchinitiative.org) and for the construction of the Uberpheno (see http://f1000research.com/articles/2-30)

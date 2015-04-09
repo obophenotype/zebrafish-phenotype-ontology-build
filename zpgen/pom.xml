@@ -28,20 +28,10 @@
     <artifactId>jcommander</artifactId>
     <version>1.30</version>
    </dependency>
-  <dependency>
-	<groupId>com.google.guava</groupId>
-	<artifactId>guava</artifactId>
-	<version>18.0</version>
-   </dependency>
    <dependency>
     <groupId>net.sourceforge.owlapi</groupId>
     <artifactId>owlapi-distribution</artifactId>
     <version>3.5.2</version>
-   </dependency>
-   <dependency>
-   	<groupId>net.sf.trove4j</groupId>
-   	<artifactId>trove4j</artifactId>
-   	<version>3.0.3</version>
    </dependency>
   </dependencies>
 

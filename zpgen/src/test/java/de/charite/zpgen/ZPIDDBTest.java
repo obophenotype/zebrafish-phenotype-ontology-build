@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 
 import junit.framework.Assert;
 
-import org.coode.owlapi.obo.parser.OBOVocabulary;
+import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;

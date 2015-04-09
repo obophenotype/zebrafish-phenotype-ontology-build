@@ -8,14 +8,15 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.coode.owlapi.obo.parser.OBOVocabulary;
+import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -34,12 +35,13 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import com.beust.jcommander.JCommander;
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from decomposed phenotype - gene associations.
  * 
- * The purpose of this tool is to create an ontology from the definition that can be found in this file (source
- * http://zfin.org/data_transfer/Downloads/phenotype.txt).
+ * The purpose of this tool is to create an ontology from the definitions that can be found in this file (source
+ * http://zfin.org/downloads/pheno.txt).
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
@@ -82,7 +84,7 @@ public class ZPGen {
 			else {
 				// log.info("Ignoring non-existent file \"" + ontologyOutputFilePath + "\" for keeping the ids");
 				// zp = manager.createOntology(zpIRI);
-				log.info("Could not find file \"" + ontologyOutputFilePath + "\" for keeping the ids");
+				log.severe("Could not find file \"" + ontologyOutputFilePath + "\" for keeping the ids");
 				throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \"" + ontologyOutputFilePath
 						+ "\" was found! Prefer to stop here...");
 			}
@@ -94,12 +96,18 @@ public class ZPGen {
 		/*
 		 * If user wants to have equivalence axioms between ZFA-classes and UBERON-classes we need the uberon.obo to create a mapping here.
 		 */
-		HashMap<String, String> zfa2uberon = null;
+		ImmutableSetMultimap<String, String> zfa2uberon = null;
 		if (addZfaUberonEquivalencies) {
 
+			log.info("creating ZFA-UBERON mapping");
+			if (uberonOboFilePath == null) {
+				log.severe("No uberon-file was provided for creating the ZFA-UBERON-mapping.");
+				throw new IllegalArgumentException(
+						"ZFA-UBERON-mapping requested, but no uberon.obo file was provided! Use option --uberon-obo-file. Prefer to stop here...");
+			}
 			File uberonOntoFile = new File(uberonOboFilePath);
 			if (!uberonOntoFile.exists()) {
-				log.info("Could not find file \"" + uberonOboFilePath + "\" for creating the ZFA-UBERON-mapping.");
+				log.severe("Could not find file \"" + uberonOboFilePath + "\" for creating the ZFA-UBERON-mapping.");
 				throw new IllegalArgumentException("ZFA-UBERON-mapping requested, but no uberon.obo file \"" + uberonOboFilePath
 						+ "\" was found! Prefer to stop here...");
 			}
@@ -131,6 +139,7 @@ public class ZPGen {
 
 		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000070"));
 		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
+		// XXX TODO ... think about this!
 		final OWLObjectProperty inheresIn = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000052"));
 		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000051"));
 
@@ -316,9 +325,25 @@ public class ZPGen {
 
 			ZFINWalker.walk(is, zfinVisitor);
 
+			// if requested, add the equivalence axioms between ZFA-class and UBERON-classes
+			if (zfa2uberon != null && zfa2uberon.keySet().size() > 0) {
+				for (Entry<String, String> zfa2uberonEntry : zfa2uberon.entries()) {
+
+					String zfaIdObo = zfa2uberonEntry.getKey();
+					String uberonIdObo = zfa2uberonEntry.getValue();
+
+					OWLClass zfaClass = factory.getOWLClass(OBOVocabulary.ID2IRI(zfaIdObo));
+					OWLClass uberonClass = factory.getOWLClass(OBOVocabulary.ID2IRI(uberonIdObo));
+
+					OWLEquivalentClassesAxiom equivZfaUberonAxiom = factory.getOWLEquivalentClassesAxiom(zfaClass, uberonClass);
+					manager.addAxiom(zp, equivZfaUberonAxiom);
+				}
+			}
+
 			/* Write output files */
 			File of = new File(ontologyOutputFilePath);
-			manager.saveOntology(zp, new FileOutputStream(of));
+			// save in manchester functional syntax
+			manager.saveOntology(zp, new OWLFunctionalSyntaxOntologyFormat(), new FileOutputStream(of));
 			log.info("Wrote \"" + of.toString() + "\"");
 			annotationOut.close();
 			if (zpCLIConfig.sourceInformationFile != null) {

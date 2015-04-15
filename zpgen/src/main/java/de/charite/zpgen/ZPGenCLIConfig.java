@@ -38,6 +38,9 @@ public class ZPGenCLIConfig {
 	@Parameter(names = { "--use-inheres-in-part-of" }, required = false, description = "If set to true, 'inheres in' is replaced by 'inheres in part of'.")
 	public boolean useInheresInPartOf = false;
 
+	@Parameter(names = { "--use-owlrdf-syntax" }, required = false, description = "If set to true, writes the output ontology in OWL-RDF syntax, which will otherwise be manchester functional syntax.")
+	public boolean useOwlRdfSyntax = false;
+
 	@Parameter(names = { "-h", "--help" }, help = true, description = "Shows this help")
 	public boolean help;
 

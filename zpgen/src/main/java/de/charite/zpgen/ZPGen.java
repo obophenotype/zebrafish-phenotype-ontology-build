@@ -102,7 +102,7 @@ public class ZPGen {
 		}
 
 		/*
-		 * Add version IRI
+		 * Add version IRI by using the date of construction
 		 */
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

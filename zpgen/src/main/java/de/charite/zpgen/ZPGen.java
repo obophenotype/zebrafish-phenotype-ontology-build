@@ -43,11 +43,10 @@ import com.beust.jcommander.JCommander;
 import com.google.common.collect.ImmutableSetMultimap;
 
 /**
- * Main class for ZP which constructs an zebrafish phenotype ontology from
- * decomposed phenotype - gene associations.
+ * Main class for ZP which constructs an zebrafish phenotype ontology from decomposed phenotype - gene associations.
  * 
- * The purpose of this tool is to create an ontology from the definitions that
- * can be found in this file (source http://zfin.org/downloads/pheno.txt).
+ * The purpose of this tool is to create an ontology from the definitions that can be found in this file (source
+ * http://zfin.org/downloads/pheno.txt).
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
@@ -82,6 +81,7 @@ public class ZPGen {
 		/* Create ontology manager and IRIs */
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/upheno/zp.owl");
+		final IRI purlOboIRI = IRI.create("http://purl.obolibrary.org/obo/");
 
 		/* Load the previous zp, if requested */
 		final OWLOntology zp;
@@ -89,7 +89,8 @@ public class ZPGen {
 			File ontoFile = new File(previousOntologyFilePath);
 			if (ontoFile.exists()) {
 				zp = manager.loadOntologyFromOntologyDocument(ontoFile);
-			} else {
+			}
+			else {
 				// log.info("Ignoring non-existent file \"" +
 				// ontologyOutputFilePath + "\" for keeping the ids");
 				// zp = manager.createOntology(zpIRI);
@@ -97,7 +98,8 @@ public class ZPGen {
 				throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \"" + previousOntologyFilePath
 						+ "\" was found! Prefer to stop here...");
 			}
-		} else {
+		}
+		else {
 			zp = manager.createOntology(zpIRI);
 		}
 
@@ -110,8 +112,7 @@ public class ZPGen {
 		manager.applyChange(new SetOntologyID(zp, new OWLOntologyID(zpIRI, versionIRI)));
 
 		/*
-		 * If user wants to have equivalence axioms between ZFA-classes and
-		 * UBERON-classes we need the uberon.obo to create a mapping here.
+		 * If user wants to have equivalence axioms between ZFA-classes and UBERON-classes we need the uberon.obo to create a mapping here.
 		 */
 		ImmutableSetMultimap<String, String> zfa2uberon = null;
 		if (addZfaUberonEquivalencies) {
@@ -155,30 +156,31 @@ public class ZPGen {
 		}
 
 		// not sure which one to use RO_0002503 or BFO_0000070 ??
-		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002503"));
+		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002503"));
 
-		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
+		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000050"));
 
 		// I have for now replaced the BFO-properties with the RO-properties
 		final OWLObjectProperty inheresProperty;
 		if (useInheresInPartOf) {
 			// inheres in part of
-			inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002314"));
-		} else {
+			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002314"));
+		}
+		else {
 			// inheres in
-			inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0000052"));
+			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
 			// inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI +
 			// "BFO_0000052"));
 		}
 
-		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000051"));
+		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000051"));
 
 		/* RO_0002180 = "has qualifier" (previously used) */
 		/* RO_0002573 = "has modifier" (used in most recent version) */
 		// final OWLObjectProperty has_qualifier =
 		// factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
-		final OWLObjectProperty has_modifier = factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002573"));
-		final OWLClass abnormal = factory.getOWLClass(IRI.create(zpIRI + "PATO_0000460"));
+		final OWLObjectProperty has_modifier = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002573"));
+		final OWLClass abnormal = factory.getOWLClass(IRI.create(purlOboIRI + "PATO_0000460"));
 
 		/* Now walk the file and create instances on the fly */
 		try {
@@ -198,22 +200,19 @@ public class ZPGen {
 				}
 			} catch (IOException ex) {
 				/*
-				 * We did not succeed in open the file and reading in a byte. We
-				 * assume that the file is not compressed.
+				 * We did not succeed in open the file and reading in a byte. We assume that the file is not compressed.
 				 */
 				is = new FileInputStream(f);
 			}
 
 			/*
-			 * Constructs an OWLClass and Axioms for each zfin entry. We expect
-			 * the reasoner to collate the classes properly. We also emit the
-			 * annotations here.
+			 * Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to collate the classes properly. We also emit
+			 * the annotations here.
 			 */
 			class ZFIN implements ZFINVisitor {
 				/**
-				 * Returns an entity class for the given obo id. This is a
-				 * simple wrapper for OBOVocabulary.ID2IRI(id) but checks
-				 * whether the term stems from a supported ontology.
+				 * Returns an entity class for the given obo id. This is a simple wrapper for OBOVocabulary.ID2IRI(id) but checks whether
+				 * the term stems from a supported ontology.
 				 * 
 				 * @param id
 				 * @return
@@ -226,9 +225,8 @@ public class ZPGen {
 				}
 
 				/**
-				 * Returns an quality class for the given obo id. This is a
-				 * simple wrapper for OBOVocabulary.ID2IRI(id) but checks
-				 * whether the term stems from a supported ontology.
+				 * Returns an quality class for the given obo id. This is a simple wrapper for OBOVocabulary.ID2IRI(id) but checks whether
+				 * the term stems from a supported ontology.
 				 * 
 				 * @param id
 				 * @return
@@ -246,8 +244,7 @@ public class ZPGen {
 						return true;
 
 					/*
-					 * Important: exclude useless annotation that look like this
-					 * ...ZFA:0001439|anatomical
+					 * Important: exclude useless annotation that look like this ...ZFA:0001439|anatomical
 					 * system|||||||PATO:0000001|quality|abnormal|
 					 */
 					if (entry.entity1SupertermId.equals("ZFA:0001439") && entry.patoID.equals("PATO:0000001") && entry.entity1SubtermId.equals("")
@@ -268,9 +265,7 @@ public class ZPGen {
 					/* Entity 1: Create intersections */
 					if (entry.entity1SubtermId != null && entry.entity1SubtermId.length() > 0) {
 						/*
-						 * Pattern is (all-some interpretation): <pato>
-						 * inheres_in (<cl2> part of <cl1>) AND qualifier
-						 * abnormal
+						 * Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal
 						 */
 						OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
 
@@ -278,16 +273,14 @@ public class ZPGen {
 								factory.getOWLObjectIntersectionOf(cl2, factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
 
 						/*
-						 * Note that is language the last word is the more
-						 * specific part of the composition, i.e., we say swim
-						 * bladder epithelium, which is the epithelium of the
-						 * swim bladder
+						 * Note that is language the last word is the more specific part of the composition, i.e., we say swim bladder
+						 * epithelium, which is the epithelium of the swim bladder
 						 */
 						label = "abnormal(ly) " + entry.patoName + " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
-					} else {
+					}
+					else {
 						/*
-						 * Pattern is (all-some interpretation): <pato>
-						 * inheres_in <cl1> AND qualifier abnormal
+						 * Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal
 						 */
 						intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresProperty, cl1));
 						label = "abnormal(ly) " + entry.patoName + " " + entry.entity1SupertermName;
@@ -300,9 +293,7 @@ public class ZPGen {
 
 						if (entry.entity2SubtermId != null && entry.entity2SubtermId.length() > 0) {
 							/*
-							 * Pattern is (all-some interpretation): <pato>
-							 * inheres_in (<cl2> part of <cl1>) AND qualifier
-							 * abnormal
+							 * Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal
 							 */
 							OWLClass cl4 = getEntityClassForOBOID(entry.entity2SubtermId);
 
@@ -310,14 +301,13 @@ public class ZPGen {
 									factory.getOWLObjectIntersectionOf(cl4, factory.getOWLObjectSomeValuesFrom(partOf, cl3))));
 
 							/*
-							 * Note that is language the last word is the more
-							 * specific part of the composition, i.e., we say
-							 * swim bladder epithelium, which is the epithelium
-							 * of the swim bladder
+							 * Note that is language the last word is the more specific part of the composition, i.e., we say swim bladder
+							 * epithelium, which is the epithelium of the swim bladder
 							 */
 							label += " towards " + entry.entity2SupertermName + " " + entry.entity2SubtermName;
 
-						} else {
+						}
+						else {
 							intersectionList.add(factory.getOWLObjectSomeValuesFrom(towards, cl3));
 							label += " towards " + entry.entity2SupertermName;
 						}
@@ -396,10 +386,11 @@ public class ZPGen {
 				// save in owl/rdf syntax
 				manager.saveOntology(zp, new RDFXMLOntologyFormat(), new FileOutputStream(of));
 				log.info("Wrote \"" + of.toString() + "\" in OWL/RDF syntax");
-			} else {
+			}
+			else {
 				// save in manchester functional syntax
 				manager.saveOntology(zp, new OWLFunctionalSyntaxOntologyFormat(), new FileOutputStream(of));
-				log.info("Wrote \"" + of.toString() + "\" in Manchester function syntax");
+				log.info("Wrote \"" + of.toString() + "\" in Manchester functional syntax");
 			}
 
 			annotationOut.close();
@@ -416,14 +407,12 @@ public class ZPGen {
 	}
 
 	/**
-	 * Custom IRI for the annotation property for the definition of the class
-	 * expression.
+	 * Custom IRI for the annotation property for the definition of the class expression.
 	 */
 	static final IRI definitionSourcePropertyIRI = IRI.create("http://zfin/definition/source_information");
 
 	/**
-	 * Add the source information for the definition of the equivalent class
-	 * expression for the given ZP class.
+	 * Add the source information for the definition of the equivalent class expression for the given ZP class.
 	 * 
 	 * @param cls
 	 * @param entry
@@ -503,7 +492,8 @@ public class ZPGen {
 							source = ((OWLLiteral) value).getLiteral();
 						}
 						break;
-					} else if (rdfsLabel.equals(prop)) {
+					}
+					else if (rdfsLabel.equals(prop)) {
 						OWLAnnotationValue value = ann.getValue();
 						if (value instanceof OWLLiteral) {
 							label = ((OWLLiteral) value).getLiteral();

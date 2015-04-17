@@ -155,7 +155,7 @@ public class ZPGen {
 			System.exit(-1);
 		}
 
-		// not sure which one to use RO_0002503 or BFO_0000070 ??
+		// was before BFO_0000070
 		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002503"));
 
 		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000050"));
@@ -167,10 +167,8 @@ public class ZPGen {
 			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002314"));
 		}
 		else {
-			// inheres in
+			// inheres in (was before BFO_0000052)
 			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
-			// inheresProperty = factory.getOWLObjectProperty(IRI.create(zpIRI +
-			// "BFO_0000052"));
 		}
 
 		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000051"));

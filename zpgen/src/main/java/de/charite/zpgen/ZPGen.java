@@ -467,36 +467,29 @@ public class ZPGen {
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
-			OWLOntologyManager m = zp.getOWLOntologyManager();
-			OWLDataFactory f = m.getOWLDataFactory();
-			OWLAnnotationProperty definitionSourceProperty = f.getOWLAnnotationProperty(definitionSourcePropertyIRI);
-			OWLAnnotationProperty rdfsLabel = f.getRDFSLabel();
+
 			for (OWLClass cls : zp.getClassesInSignature()) {
+
 				String zpID = OBOVocabulary.IRI2ID(cls.getIRI());
 				if (zpID.startsWith("ZP:") == false) {
 					// Ignore non ZP classes
 					continue;
 				}
+
 				String label = null;
 				String source = null;
 
-				// Check annotations for source information and label
-				Set<OWLAnnotationAssertionAxiom> annotations = zp.getAnnotationAssertionAxioms(cls.getIRI());
-				for (OWLAnnotationAssertionAxiom ann : annotations) {
-					OWLAnnotationProperty prop = ann.getProperty();
-					if (definitionSourceProperty.equals(prop)) {
-						OWLAnnotationValue value = ann.getValue();
-						if (value instanceof OWLLiteral) {
-							source = ((OWLLiteral) value).getLiteral();
-						}
-						break;
-					}
-					else if (rdfsLabel.equals(prop)) {
-						OWLAnnotationValue value = ann.getValue();
-						if (value instanceof OWLLiteral) {
-							label = ((OWLLiteral) value).getLiteral();
-						}
-					}
+				for (OWLAnnotation annotation : cls.getAnnotations(zp)) {
+
+					OWLAnnotationValue value = annotation.getValue();
+					OWLAnnotationProperty property = annotation.getProperty();
+					IRI propertyIri = property.getIRI();
+
+					if (propertyIri.equals(definitionSourcePropertyIRI))
+						source = ((OWLLiteral) value).getLiteral();
+
+					if (property.isLabel())
+						label = ((OWLLiteral) value).getLiteral();
 				}
 
 				// write the information

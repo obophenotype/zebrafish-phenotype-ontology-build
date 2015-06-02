@@ -138,6 +138,7 @@ public class ZPGen {
 
 		/* Where to write the annotation file to */
 		final BufferedWriter annotationOut = new BufferedWriter(new FileWriter(annotFilePath));
+		final BufferedWriter negativeAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "_negative"));
 
 		/* Obtain the default data factory */
 		final OWLDataFactory factory = manager.getOWLDataFactory();
@@ -237,9 +238,9 @@ public class ZPGen {
 				}
 
 				public boolean visit(ZFINEntry entry) {
-					/* we only handle 'abnormal' entries */
-					if (!entry.isAbnormal)
-						return true;
+
+					// if (!entry.isAbnormal)
+					// return true;
 
 					/*
 					 * Important: exclude useless annotation that look like this ...ZFA:0001439|anatomical
@@ -248,6 +249,14 @@ public class ZPGen {
 					if (entry.entity1SupertermId.equals("ZFA:0001439") && entry.patoID.equals("PATO:0000001") && entry.entity1SubtermId.equals("")
 							&& entry.entity2SupertermId.equals("") && entry.entity2SubtermId.equals(""))
 						return true;
+
+					/*
+					 * for annotations that are normal we generate the abnormal counterpart. for this we sometimes have to correct the PATO
+					 * modifier used by the annotator. E.g. "normal amount" has to be replace with amount, because the "normal"-tag already
+					 * indicates the fact that this is normal
+					 */
+					EntryCorrector corrector = new EntryCorrector(entry);
+					entry = corrector.getCorrectedEntry();
 
 					OWLClass pato = getQualiClassForOBOID(entry.patoID);
 					OWLClass cl1 = getEntityClassForOBOID(entry.entity1SupertermId);
@@ -338,7 +347,13 @@ public class ZPGen {
 					 * Writing the annotation file
 					 */
 					try {
-						annotationOut.write(entry.geneZfinID + "\t" + zpID + "\t" + label + "\n");
+						// write negative (not-) annotations to a different file
+						if (!entry.isAbnormal) {
+							negativeAnnotationOut.write(entry.geneZfinID + "\t" + zpID + "\t" + label + "\tNOT\n");
+						}
+						else {
+							annotationOut.write(entry.geneZfinID + "\t" + zpID + "\t" + label + "\n");
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -392,6 +407,8 @@ public class ZPGen {
 			}
 
 			annotationOut.close();
+			negativeAnnotationOut.close();
+
 			if (zpCLIConfig.sourceInformationFile != null) {
 				saveSourceInformation(zp, zpCLIConfig.sourceInformationFile);
 			}

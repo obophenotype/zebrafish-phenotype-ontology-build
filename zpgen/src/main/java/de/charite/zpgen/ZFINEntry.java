@@ -7,7 +7,10 @@ package de.charite.zpgen;
  * @author Sebastian Koehler
  */
 public class ZFINEntry {
-	public String geneZfinID;
+	/**
+	 * Gene or Geno
+	 */
+	public String genxZfinID;
 
 	public String entity1SupertermId;
 	public String entity1SupertermName;
@@ -27,7 +30,8 @@ public class ZFINEntry {
 	public boolean isAbnormal;
 
 	/**
-	 * Creates the concatenated string representation of the ID's of the classes used, e.g. "PATO:0023,ZFA:0234" or
+	 * Creates the concatenated string representation of the ID's of the classes
+	 * used, e.g. "PATO:0023,ZFA:0234" or
 	 * "PATO:0023,ZFA:3332,PATO:3322,GO:00032"
 	 * 
 	 * @return

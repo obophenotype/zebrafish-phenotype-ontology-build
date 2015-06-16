@@ -8,8 +8,11 @@ import com.beust.jcommander.Parameter;
  * @author Sebastian Bauer
  */
 public class ZPGenCLIConfig {
-	@Parameter(names = { "-z", "--zfin-input-file" }, required = true, description = "The file containing the decomposed phenotype - gene associations (e.g., http://zfin.org/data_transfer/Downloads/phenotype.txt)")
-	public String zfinFilePath;
+	@Parameter(names = { "--zfin-pheno-txt-input-file" }, required = true, description = "The file containing the decomposed phenotype - gene associations (i.e. http://zfin.org/downloads/pheno.txt)")
+	public String zfinPhenoTxtPath;
+
+	@Parameter(names = { "--zfin-phenotype-txt-input-file" }, required = true, description = "The file containing the decomposed phenotype - genotype associations (i.e. http://zfin.org/downloads/phenotype.txt)")
+	public String zfinPhenotypeTxtPath;
 
 	@Parameter(names = { "-p", "--previous-ontology-file" }, required = true, description = "The last version of the ontology. Used to keep IDs!!!")
 	public String previousOntologyFilePath;
@@ -17,7 +20,7 @@ public class ZPGenCLIConfig {
 	@Parameter(names = { "-o", "--ontology-output-file" }, required = true, description = "Where the ontology file (e.g. ZP.owl) is written to")
 	public String ontologyOutputFilePath;
 
-	@Parameter(names = { "-a", "--annotation-output-file" }, required = true, description = "Where the annotation file (e.g. ZP.annot) is written to")
+	@Parameter(names = { "-a", "--annotation-output-folder" }, required = true, description = "Where the annotation files (e.g. ZP.annot) are written to")
 	public String annotFilePath;
 
 	@Parameter(names = { "-k", "--keep-ids" }, required = false, description = "If the output ontology file is already valid, keep the ids (ZP_nnnnnnn) stored in that file.")

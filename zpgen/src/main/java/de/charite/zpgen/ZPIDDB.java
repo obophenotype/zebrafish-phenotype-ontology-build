@@ -35,7 +35,8 @@ public class ZPIDDB {
 	}
 
 	/**
-	 * Constructs a zp id data base and filling it with previously assigned ids gathered from the given ontology.
+	 * Constructs a zp id data base and filling it with previously assigned ids
+	 * gathered from the given ontology.
 	 * 
 	 * @param zp
 	 */
@@ -79,18 +80,28 @@ public class ZPIDDB {
 	}
 
 	/**
-	 * Returns the Id (as IRI) of the given owlSomeClassExp. This may be a new one if classExpression was not seen before.
+	 * Returns the Id (as IRI) of the given owlSomeClassExp. This may be a new
+	 * one if classExpression was not seen before.
 	 * 
 	 * @param owlSomeClassExp
 	 * @return
 	 */
 	public IRI getZPId(OWLClassExpression classExpression) {
+
 		IRI zpIdIRI = class2Id.get(classExpression);
 		if (zpIdIRI != null)
 			return zpIdIRI;
+
 		String zpId = String.format("ZP:%07d", nextId++);
 		zpIdIRI = OBOVocabulary.ID2IRI(zpId);
 		class2Id.put(classExpression, zpIdIRI);
 		return zpIdIRI;
+	}
+
+	public boolean isAlreadyContained(OWLClassExpression classExpression) {
+		IRI zpIdIRI = class2Id.get(classExpression);
+		if (zpIdIRI != null)
+			return true;
+		return false;
 	}
 }

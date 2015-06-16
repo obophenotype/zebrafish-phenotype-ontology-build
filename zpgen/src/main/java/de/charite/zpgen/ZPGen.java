@@ -164,10 +164,10 @@ public class ZPGen {
 		final ZPIDDB zpIdDB = new ZPIDDB(zp);
 
 		/* Where to write the annotation file to */
-		final BufferedWriter annotationPhenoTxtOut = new BufferedWriter(new FileWriter(annotFilePath + "zp_gene.annot"));
-		final BufferedWriter negativePhenoTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "zp_gene_negative.annot"));
-		final BufferedWriter annotationPhenotypeTxtOut = new BufferedWriter(new FileWriter(annotFilePath + "zp_geno.annot"));
-		final BufferedWriter negativePhenotypeTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "zp_geno_negative.annot"));
+		final BufferedWriter annotationPhenoTxtOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_gene_pos.txt"));
+		final BufferedWriter negativePhenoTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_gene_neg.txt"));
+		final BufferedWriter annotationPhenotypeTxtOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_geno_pos.txt"));
+		final BufferedWriter negativePhenotypeTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_geno_neg.txt"));
 
 		// was before BFO_0000070
 		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002503"));

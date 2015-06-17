@@ -202,6 +202,7 @@ public class ZPGen {
 		 * reasoner used at the moment We also emit the annotations here.
 		 */
 		class ZFIN implements ZFINVisitor {
+
 			/**
 			 * Returns an entity class for the given obo id. This is a simple wrapper for OBOVocabulary.ID2IRI(id) but checks whether the
 			 * term stems from a supported ontology.
@@ -445,24 +446,21 @@ public class ZPGen {
 		OWLDataFactory f = m.getOWLDataFactory();
 		OWLAnnotationProperty definitionSourceProperty = f.getOWLAnnotationProperty(definitionSourcePropertyIRI);
 
-		// search for existing source information
+		// search for existing source information and remove it
 		Set<OWLAnnotationAssertionAxiom> annotations = zp.getAnnotationAssertionAxioms(cls.getIRI());
-		boolean hasSourceInformation = false;
 		for (OWLAnnotationAssertionAxiom ann : annotations) {
 			if (definitionSourceProperty.equals(ann.getProperty())) {
-				hasSourceInformation = true;
-				break;
+				m.removeAxiom(zp, ann);
 			}
 		}
-		// only add new information if no previous one exists
-		if (hasSourceInformation == false) {
-			if (entry.sourceString == null) {
-				System.err.println("source string null: " + entry.genxZfinID);
-			}
-			OWLAnnotation sourceAnno = f.getOWLAnnotation(definitionSourceProperty, f.getOWLLiteral(entry.sourceString));
-			OWLAxiom labelAnnoAxiom = f.getOWLAnnotationAssertionAxiom(cls.getIRI(), sourceAnno);
-			m.addAxiom(zp, labelAnnoAxiom);
+		if (entry.sourceString == null) {
+			System.err.println("source string null: " + entry.genxZfinID);
 		}
+
+		// add source information
+		OWLAnnotation sourceAnno = f.getOWLAnnotation(definitionSourceProperty, f.getOWLLiteral(entry.sourceString));
+		OWLAxiom labelAnnoAxiom = f.getOWLAnnotationAssertionAxiom(cls.getIRI(), sourceAnno);
+		m.addAxiom(zp, labelAnnoAxiom);
 	}
 
 	/**

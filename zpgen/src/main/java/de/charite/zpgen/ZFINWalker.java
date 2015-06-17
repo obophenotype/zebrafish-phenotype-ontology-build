@@ -198,8 +198,14 @@ public class ZFINWalker {
 		source.append('\t');
 		source.append(entry.patoID); // phenotype_keyword_id
 		source.append('\t');
-		source.append("PATO:0000460"); // phenotype_modifier, currently
-										// always abnormal
+
+		// phenotype_modifier, currently always abnormal or normal
+		if (entry.isAbnormal) {
+			source.append("PATO:0000460"); // abnormal
+		}
+		else {
+			source.append("PATO:0000461"); // normal
+		}
 		source.append('\t');
 		if (entry.entity2SupertermId != null) {
 			source.append(entry.entity2SupertermId);// affected_structure_or_process_2_superterm_id

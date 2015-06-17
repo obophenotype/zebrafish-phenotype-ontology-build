@@ -7,11 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Provides a method to walkes a ZFIN file. Calls
- * {@link ZFINVisitor#visit(ZFINEntry)} for each encountered entry.
+ * Provides a method to walkes a ZFIN file. Calls {@link ZFINVisitor#visit(ZFINEntry)} for each encountered entry.
  * 
- * See http://zfin.org/downloads for a current format (pheno.txt and
- * phenotype.txt).
+ * See http://zfin.org/downloads for a current format (pheno.txt and phenotype.txt).
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
@@ -51,20 +49,20 @@ public class ZFINWalker {
 	 * 21 Publication ID <br>
 	 * 22 Environment ID<br>
 	 */
-	static int PHENOTYPE_TXT_COLUMN_ZFIN_GENO_ID = 0;
-	static int PHENOTYPE_TXT_COLUMN_TERM1_SUBTERM_ID = 6;
-	static int PHENOTYPE_TXT_COLUMN_TERM1_SUBTERM_NAME = 7;
-	static int PHENOTYPE_TXT_COLUMN_TERM1_SUPERTERM_ID = 10;
-	static int PHENOTYPE_TXT_COLUMN_TERM1_SUPERTERM_NAME = 11;
+	private static final int PHENOTYPE_TXT_COLUMN_ZFIN_GENO_ID = 0;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM1_SUBTERM_ID = 6;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM1_SUBTERM_NAME = 7;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM1_SUPERTERM_ID = 10;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM1_SUPERTERM_NAME = 11;
 
-	static int PHENOTYPE_TXT_COLUMN_TERM2_SUBTERM_ID = 15;
-	static int PHENOTYPE_TXT_COLUMN_TERM2_SUBTERM_NAME = 16;
-	static int PHENOTYPE_TXT_COLUMN_TERM2_SUPERTERM_ID = 19;
-	static int PHENOTYPE_TXT_COLUMN_TERM2_SUPERTERM_NAME = 20;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM2_SUBTERM_ID = 15;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM2_SUBTERM_NAME = 16;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM2_SUPERTERM_ID = 19;
+	private static final int PHENOTYPE_TXT_COLUMN_TERM2_SUPERTERM_NAME = 20;
 
-	static int PHENOTYPE_TXT_COLUMN_PATO_ID = 12;
-	static int PHENOTYPE_TXT_COLUMN_PATO_NAME = 13;
-	static int PHENOTYPE_TXT_COLUMN_PATO_MODIFIER = 14;
+	private static final int PHENOTYPE_TXT_COLUMN_PATO_ID = 12;
+	private static final int PHENOTYPE_TXT_COLUMN_PATO_NAME = 13;
+	private static final int PHENOTYPE_TXT_COLUMN_PATO_MODIFIER = 14;
 
 	/**
 	 * The current file format for pheno.txt as of: 8 Sep 2013<br>
@@ -88,20 +86,20 @@ public class ZFINWalker {
 	 * 17 Affected Structure or Process 2 superterm OBO ID<br>
 	 * 18 Affected Structure or Process 2 superterm name<br>
 	 */
-	static int PHENO_TXT_COLUMN_ZFIN_GENE_ID = 0;
-	static int PHENO_TXT_COLUMN_TERM1_SUBTERM_ID = 4;
-	static int PHENO_TXT_COLUMN_TERM1_SUBTERM_NAME = 5;
-	static int PHENO_TXT_COLUMN_TERM1_SUPERTERM_ID = 8;
-	static int PHENO_TXT_COLUMN_TERM1_SUPERTERM_NAME = 9;
+	private static final int PHENO_TXT_COLUMN_ZFIN_GENE_ID = 0;
+	private static final int PHENO_TXT_COLUMN_TERM1_SUBTERM_ID = 4;
+	private static final int PHENO_TXT_COLUMN_TERM1_SUBTERM_NAME = 5;
+	private static final int PHENO_TXT_COLUMN_TERM1_SUPERTERM_ID = 8;
+	private static final int PHENO_TXT_COLUMN_TERM1_SUPERTERM_NAME = 9;
 
-	static int PHENO_TXT_COLUMN_TERM2_SUBTERM_ID = 13;
-	static int PHENO_TXT_COLUMN_TERM2_SUBTERM_NAME = 14;
-	static int PHENO_TXT_COLUMN_TERM2_SUPERTERM_ID = 17;
-	static int PHENO_TXT_COLUMN_TERM2_SUPERTERM_NAME = 18;
+	private static final int PHENO_TXT_COLUMN_TERM2_SUBTERM_ID = 13;
+	private static final int PHENO_TXT_COLUMN_TERM2_SUBTERM_NAME = 14;
+	private static final int PHENO_TXT_COLUMN_TERM2_SUPERTERM_ID = 17;
+	private static final int PHENO_TXT_COLUMN_TERM2_SUPERTERM_NAME = 18;
 
-	static int PHENO_TXT_COLUMN_PATO_ID = 10;
-	static int PHENO_TXT_COLUMN_PATO_NAME = 11;
-	static int PHENO_TXT_COLUMN_PATO_MODIFIER = 12;
+	private static final int PHENO_TXT_COLUMN_PATO_ID = 10;
+	private static final int PHENO_TXT_COLUMN_PATO_NAME = 11;
+	private static final int PHENO_TXT_COLUMN_PATO_MODIFIER = 12;
 
 	static public void walk(InputStream input, ZFINVisitor visitor, ZFIN_FILE_TYPE zfinFileType, BufferedWriter outPositiveAnnotations,
 			BufferedWriter outNegativeAnnotations) throws IOException {
@@ -133,7 +131,11 @@ public class ZFINWalker {
 					entry.patoName = sp[PHENO_TXT_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENO_TXT_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
 
-				} else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
+					// fix bug with 7 entries that use wrong phenotype-tag (usually only normal/abnormal allowed)
+					checkPhenotypeTag(sp[PHENO_TXT_COLUMN_PATO_MODIFIER], entry);
+				}
+				else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
+
 					entry.genxZfinID = sp[PHENOTYPE_TXT_COLUMN_ZFIN_GENO_ID];
 
 					entry.entity1SupertermId = sp[PHENOTYPE_TXT_COLUMN_TERM1_SUPERTERM_ID];
@@ -149,9 +151,17 @@ public class ZFINWalker {
 					entry.patoID = sp[PHENOTYPE_TXT_COLUMN_PATO_ID];
 					entry.patoName = sp[PHENOTYPE_TXT_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
-				} else {
+
+					// fix bug with 7 entries that use wrong phenotype-tag (usually only normal/abnormal allowed)
+					checkPhenotypeTag(sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER], entry);
+
+				}
+				else {
 					throw new IllegalArgumentException("Unrecognized zfin-file-type: " + zfinFileType);
 				}
+
+				// create the source string NOW
+				entry.sourceString = generateSourceString(entry);
 
 				visitor.visit(entry, outPositiveAnnotations, outNegativeAnnotations);
 			} catch (Exception e) {
@@ -160,5 +170,39 @@ public class ZFINWalker {
 				System.exit(1);
 			}
 		}
+	}
+
+	private static void checkPhenotypeTag(String string, ZFINEntry entry) {
+		if (!(string.equals("abnormal") || string.equals("normal"))) {
+			System.err.println("wrong format for entry " + entry.genxZfinID + " expected normal/abnormal, found '" + string + "'");
+		}
+		if (string.equals("absent") && entry.entity1SupertermId.equals("GO:0007601")) {
+			entry.isAbnormal = true;
+			entry.patoID = "PATO:0000462";
+			entry.patoName = "absent";
+		}
+	}
+
+	public static String generateSourceString(ZFINEntry entry) {
+		StringBuilder source = new StringBuilder();
+		source.append(entry.entity1SupertermId); // affected_structure_or_process_1_superterm_id
+		source.append('\t');
+		if (entry.entity1SubtermId != null) {
+			source.append(entry.entity1SubtermId); // affected_structure_or_process_1_subterm_id
+		}
+		source.append('\t');
+		source.append(entry.patoID); // phenotype_keyword_id
+		source.append('\t');
+		source.append("PATO:0000460"); // phenotype_modifier, currently
+										// always abnormal
+		source.append('\t');
+		if (entry.entity2SupertermId != null) {
+			source.append(entry.entity2SupertermId);// affected_structure_or_process_2_superterm_id
+		}
+		source.append('\t');
+		if (entry.entity2SubtermId != null) {
+			source.append(entry.entity2SubtermId); // affected_structure_or_process_2_subterm_id
+		}
+		return source.toString();
 	}
 }

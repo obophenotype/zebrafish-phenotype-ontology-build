@@ -45,11 +45,10 @@ import com.google.common.collect.Lists;
 import de.charite.zpgen.ZFINWalker.ZFIN_FILE_TYPE;
 
 /**
- * Main class for ZP which constructs an zebrafish phenotype ontology from
- * decomposed phenotype - gene/geno associations.
+ * Main class for ZP which constructs an zebrafish phenotype ontology from decomposed phenotype - gene/geno associations.
  * 
- * The purpose of this tool is to create an ontology from the definitions that
- * can be found in this file (source http://zfin.org/downloads/pheno.txt).
+ * The purpose of this tool is to create an ontology from the definitions that can be found in this file (source
+ * http://zfin.org/downloads/pheno.txt).
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
@@ -97,7 +96,8 @@ public class ZPGen {
 			File ontoFile = new File(previousOntologyFilePath);
 			if (ontoFile.exists()) {
 				zp = manager.loadOntologyFromOntologyDocument(ontoFile);
-			} else {
+			}
+			else {
 				// log.info("Ignoring non-existent file \"" +
 				// ontologyOutputFilePath + "\" for keeping the ids");
 				// zp = manager.createOntology(zpIRI);
@@ -125,7 +125,8 @@ public class ZPGen {
 			// }
 			// System.out.println("---> " + axiom.getSubject());
 			// }
-		} else {
+		}
+		else {
 			zp = manager.createOntology(zpIRI);
 		}
 
@@ -138,8 +139,7 @@ public class ZPGen {
 		manager.applyChange(new SetOntologyID(zp, new OWLOntologyID(zpIRI, versionIRI)));
 
 		/*
-		 * If user wants to have equivalence axioms between ZFA-classes and
-		 * UBERON-classes we need the uberon.obo to create a mapping here.
+		 * If user wants to have equivalence axioms between ZFA-classes and UBERON-classes we need the uberon.obo to create a mapping here.
 		 */
 		ImmutableSetMultimap<String, String> zfa2uberon = null;
 		if (addZfaUberonEquivalencies) {
@@ -178,7 +178,8 @@ public class ZPGen {
 		if (useInheresInPartOf) {
 			// inheres in part of
 			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002314"));
-		} else {
+		}
+		else {
 			// inheres in (was before BFO_0000052)
 			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
 		}
@@ -197,15 +198,13 @@ public class ZPGen {
 		InputStream inputStreamPhenotypeTxt = new FileInputStream(new File(zfinPhenotypeTxtFilePath));
 
 		/*
-		 * Constructs an OWLClass and Axioms for each zfin entry. We expect the
-		 * reasoner to collate the classes properly. (There is no reasoner used
-		 * at the moment We also emit the annotations here.
+		 * Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to collate the classes properly. (There is no
+		 * reasoner used at the moment We also emit the annotations here.
 		 */
 		class ZFIN implements ZFINVisitor {
 			/**
-			 * Returns an entity class for the given obo id. This is a simple
-			 * wrapper for OBOVocabulary.ID2IRI(id) but checks whether the term
-			 * stems from a supported ontology.
+			 * Returns an entity class for the given obo id. This is a simple wrapper for OBOVocabulary.ID2IRI(id) but checks whether the
+			 * term stems from a supported ontology.
 			 * 
 			 * @param id
 			 * @return
@@ -225,9 +224,8 @@ public class ZPGen {
 			}
 
 			/**
-			 * Returns an quality class for the given obo id. This is a simple
-			 * wrapper for OBOVocabulary.ID2IRI(id) but checks whether the term
-			 * stems from a supported ontology.
+			 * Returns an quality class for the given obo id. This is a simple wrapper for OBOVocabulary.ID2IRI(id) but checks whether the
+			 * term stems from a supported ontology.
 			 * 
 			 * @param id
 			 * @return
@@ -241,12 +239,8 @@ public class ZPGen {
 
 			public boolean visit(ZFINEntry entry, BufferedWriter outPositiveAnnotations, BufferedWriter outNegativeAnnotations) {
 
-				// if (!entry.isAbnormal)
-				// return true;
-
 				/*
-				 * Important: exclude useless annotation that look like this
-				 * ...ZFA:0001439|anatomical
+				 * Important: exclude useless annotation that look like this ...ZFA:0001439|anatomical
 				 * system|||||||PATO:0000001|quality|abnormal|
 				 */
 				if (entry.entity1SupertermId.equals("ZFA:0001439") && entry.patoID.equals("PATO:0000001") && entry.entity1SubtermId.equals("")
@@ -254,10 +248,8 @@ public class ZPGen {
 					return true;
 
 				/*
-				 * for annotations that are normal we generate the abnormal
-				 * counterpart. for this we sometimes have to correct the PATO
-				 * modifier used by the annotator. E.g. "normal amount" has to
-				 * be replace with amount, because the "normal"-tag already
+				 * for annotations that are normal we generate the abnormal counterpart. for this we sometimes have to correct the PATO
+				 * modifier used by the annotator. E.g. "normal amount" has to be replace with amount, because the "normal"-tag already
 				 * indicates the fact that this is normal
 				 */
 				EntryCorrector corrector = new EntryCorrector(entry);
@@ -277,8 +269,7 @@ public class ZPGen {
 				/* Entity 1: Create intersections */
 				if (entry.entity1SubtermId != null && entry.entity1SubtermId.length() > 0) {
 					/*
-					 * Pattern is (all-some interpretation): <pato> inheres_in
-					 * (<cl2> part of <cl1>) AND qualifier abnormal
+					 * Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal
 					 */
 					OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
 
@@ -286,15 +277,14 @@ public class ZPGen {
 							factory.getOWLObjectIntersectionOf(cl2, factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
 
 					/*
-					 * Note that is language the last word is the more specific
-					 * part of the composition, i.e., we say swim bladder
+					 * Note that is language the last word is the more specific part of the composition, i.e., we say swim bladder
 					 * epithelium, which is the epithelium of the swim bladder
 					 */
 					label = "abnormal(ly) " + entry.patoName + " " + entry.entity1SupertermName + " " + entry.entity1SubtermName;
-				} else {
+				}
+				else {
 					/*
-					 * Pattern is (all-some interpretation): <pato> inheres_in
-					 * <cl1> AND qualifier abnormal
+					 * Pattern is (all-some interpretation): <pato> inheres_in <cl1> AND qualifier abnormal
 					 */
 					intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresProperty, cl1));
 					label = "abnormal(ly) " + entry.patoName + " " + entry.entity1SupertermName;
@@ -307,9 +297,7 @@ public class ZPGen {
 
 					if (entry.entity2SubtermId != null && entry.entity2SubtermId.length() > 0) {
 						/*
-						 * Pattern is (all-some interpretation): <pato>
-						 * inheres_in (<cl2> part of <cl1>) AND qualifier
-						 * abnormal
+						 * Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND qualifier abnormal
 						 */
 						OWLClass cl4 = getEntityClassForOBOID(entry.entity2SubtermId);
 
@@ -317,14 +305,13 @@ public class ZPGen {
 								factory.getOWLObjectIntersectionOf(cl4, factory.getOWLObjectSomeValuesFrom(partOf, cl3))));
 
 						/*
-						 * Note that is language the last word is the more
-						 * specific part of the composition, i.e., we say swim
-						 * bladder epithelium, which is the epithelium of the
-						 * swim bladder
+						 * Note that is language the last word is the more specific part of the composition, i.e., we say swim bladder
+						 * epithelium, which is the epithelium of the swim bladder
 						 */
 						label += " towards " + entry.entity2SupertermName + " " + entry.entity2SubtermName;
 
-					} else {
+					}
+					else {
 						intersectionList.add(factory.getOWLObjectSomeValuesFrom(towards, cl3));
 						label += " towards " + entry.entity2SupertermName;
 					}
@@ -335,33 +322,23 @@ public class ZPGen {
 
 				OWLClassExpression owlSomeClassExp = factory.getOWLObjectSomeValuesFrom(hasPart, intersectionExpression);
 
-				// we want to know before if this class was already present
-				boolean previouslyContainedInZp = zpIdDB.isAlreadyContained(owlSomeClassExp);
-
 				// get the class
 				IRI zpIRI = zpIdDB.getZPId(owlSomeClassExp);
 				String zpID = OBOVocabulary.IRI2ID(zpIRI);
 				OWLClass zpTerm = factory.getOWLClass(zpIRI);
 
-				/*
-				 * The following has to be done only in case the class wasn't
-				 * present before
-				 */
-				if (!previouslyContainedInZp) {
-					/* Make term equivalent to the intersection */
-					OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, owlSomeClassExp);
-					manager.addAxiom(zp, axiom);
+				/* Make term equivalent to the intersection */
+				OWLEquivalentClassesAxiom axiom = factory.getOWLEquivalentClassesAxiom(zpTerm, owlSomeClassExp);
+				manager.addAxiom(zp, axiom);
 
-					/* Add label */
-					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(), factory.getOWLLiteral(label));
-					OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
-					manager.addAxiom(zp, labelAnnoAxiom);
+				/* Add label */
+				OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(), factory.getOWLLiteral(label));
+				OWLAxiom labelAnnoAxiom = factory.getOWLAnnotationAssertionAxiom(zpTerm.getIRI(), labelAnno);
+				manager.addAxiom(zp, labelAnnoAxiom);
 
-					/* Add source information */
-					if (addSourceInformation) {
-						addSourceInformation(zpTerm, entry, zp);
-					}
-
+				/* Add source information */
+				if (addSourceInformation) {
+					addSourceInformation(zpTerm, entry, zp);
 				}
 
 				/*
@@ -371,7 +348,8 @@ public class ZPGen {
 					// write negative (not-) annotations to a different file
 					if (!entry.isAbnormal) {
 						outNegativeAnnotations.write(entry.genxZfinID + "\t" + zpID + "\t" + label + "\tNOT\n");
-					} else {
+					}
+					else {
 						outPositiveAnnotations.write(entry.genxZfinID + "\t" + zpID + "\t" + label + "\n");
 					}
 				} catch (IOException e) {
@@ -420,7 +398,8 @@ public class ZPGen {
 			// save in owl/rdf syntax
 			manager.saveOntology(zp, new RDFXMLOntologyFormat(), new FileOutputStream(of));
 			log.info("Wrote \"" + of.toString() + "\" in OWL/RDF syntax");
-		} else {
+		}
+		else {
 			// save in manchester functional syntax
 			manager.saveOntology(zp, new OWLFunctionalSyntaxOntologyFormat(), new FileOutputStream(of));
 			log.info("Wrote \"" + of.toString() + "\" in Manchester functional syntax");
@@ -445,18 +424,17 @@ public class ZPGen {
 		rootEntry.entity1SupertermId = rootId;// "ZFA:0100000";
 		rootEntry.entity1SupertermName = rootLabel;// "zebrafish anatomical entity";
 		rootEntry.entity2SupertermId = "";
+		rootEntry.sourceString = ZFINWalker.generateSourceString(rootEntry);
 		return rootEntry;
 	}
 
 	/**
-	 * Custom IRI for the annotation property for the definition of the class
-	 * expression.
+	 * Custom IRI for the annotation property for the definition of the class expression.
 	 */
 	static final IRI definitionSourcePropertyIRI = IRI.create("http://zfin/definition/source_information");
 
 	/**
-	 * Add the source information for the definition of the equivalent class
-	 * expression for the given ZP class.
+	 * Add the source information for the definition of the equivalent class expression for the given ZP class.
 	 * 
 	 * @param cls
 	 * @param entry
@@ -478,26 +456,10 @@ public class ZPGen {
 		}
 		// only add new information if no previous one exists
 		if (hasSourceInformation == false) {
-			StringBuilder source = new StringBuilder();
-			source.append(entry.entity1SupertermId); // affected_structure_or_process_1_superterm_id
-			source.append('\t');
-			if (entry.entity1SubtermId != null) {
-				source.append(entry.entity1SubtermId); // affected_structure_or_process_1_subterm_id
+			if (entry.sourceString == null) {
+				System.err.println("source string null: " + entry.genxZfinID);
 			}
-			source.append('\t');
-			source.append(entry.patoID); // phenotype_keyword_id
-			source.append('\t');
-			source.append("PATO:0000460"); // phenotype_modifier, currently
-											// always abnormal
-			source.append('\t');
-			if (entry.entity2SupertermId != null) {
-				source.append(entry.entity2SupertermId);// affected_structure_or_process_2_superterm_id
-			}
-			source.append('\t');
-			if (entry.entity2SubtermId != null) {
-				source.append(entry.entity2SubtermId); // affected_structure_or_process_2_subterm_id
-			}
-			OWLAnnotation sourceAnno = f.getOWLAnnotation(definitionSourceProperty, f.getOWLLiteral(source.toString()));
+			OWLAnnotation sourceAnno = f.getOWLAnnotation(definitionSourceProperty, f.getOWLLiteral(entry.sourceString));
 			OWLAxiom labelAnnoAxiom = f.getOWLAnnotationAssertionAxiom(cls.getIRI(), sourceAnno);
 			m.addAxiom(zp, labelAnnoAxiom);
 		}

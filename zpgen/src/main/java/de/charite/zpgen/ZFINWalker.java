@@ -152,9 +152,6 @@ public class ZFINWalker {
 					entry.patoName = sp[PHENOTYPE_TXT_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
 
-					// fix bug with 7 entries that use wrong phenotype-tag (usually only normal/abnormal allowed)
-					checkPhenotypeTag(sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER], entry);
-
 				}
 				else {
 					throw new IllegalArgumentException("Unrecognized zfin-file-type: " + zfinFileType);
@@ -162,6 +159,14 @@ public class ZFINWalker {
 
 				// create the source string NOW
 				entry.sourceString = generateSourceString(entry);
+
+				// fix bug with 7 entries that use wrong phenotype-tag (usually only normal/abnormal allowed)
+				if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_TXT)) {
+					checkPhenotypeTag(sp[PHENO_TXT_COLUMN_PATO_MODIFIER], entry);
+				}
+				else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
+					checkPhenotypeTag(sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER], entry);
+				}
 
 				visitor.visit(entry, outPositiveAnnotations, outNegativeAnnotations);
 			} catch (Exception e) {

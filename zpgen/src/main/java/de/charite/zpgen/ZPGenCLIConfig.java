@@ -21,7 +21,7 @@ public class ZPGenCLIConfig {
 	public String ontologyOutputFilePath;
 
 	@Parameter(names = { "-a", "--annotation-output-folder" }, required = true, description = "Where the annotation files (e.g. ZP.annot) are written to")
-	public String annotFilePath;
+	public String annotationsFolder;
 
 	@Parameter(names = { "-k", "--keep-ids" }, required = false, description = "If the output ontology file is already valid, keep the ids (ZP_nnnnnnn) stored in that file.")
 	public boolean keepIds = false;

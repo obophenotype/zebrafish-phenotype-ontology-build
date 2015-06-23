@@ -21,7 +21,6 @@ import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -73,7 +72,7 @@ public class ZPGen {
 		final String zfinPhenotypeTxtFilePath = zpCLIConfig.zfinPhenotypeTxtPath;
 		final String previousOntologyFilePath = zpCLIConfig.previousOntologyFilePath;
 		final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
-		final String annotFilePath = zpCLIConfig.annotFilePath;
+		final String annotFilesFolder = zpCLIConfig.annotationsFolder;
 		final boolean keepIds = zpCLIConfig.keepIds;
 		final boolean useInheresInPartOf = zpCLIConfig.useInheresInPartOf;
 		final boolean useOwlRdfSyntax = zpCLIConfig.useOwlRdfSyntax;
@@ -164,10 +163,10 @@ public class ZPGen {
 		final ZPIDDB zpIdDB = new ZPIDDB(zp);
 
 		/* Where to write the annotation file to */
-		final BufferedWriter annotationPhenoTxtOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_gene_pos.txt"));
-		final BufferedWriter negativePhenoTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_gene_neg.txt"));
-		final BufferedWriter annotationPhenotypeTxtOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_geno_pos.txt"));
-		final BufferedWriter negativePhenotypeTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilePath + "annot_geno_neg.txt"));
+		final BufferedWriter annotationPhenoTxtOut = new BufferedWriter(new FileWriter(annotFilesFolder + "annot_gene_pos.txt"));
+		final BufferedWriter negativePhenoTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilesFolder + "annot_gene_neg.txt"));
+		final BufferedWriter annotationPhenotypeTxtOut = new BufferedWriter(new FileWriter(annotFilesFolder + "annot_geno_pos.txt"));
+		final BufferedWriter negativePhenotypeTxtAnnotationOut = new BufferedWriter(new FileWriter(annotFilesFolder + "annot_geno_neg.txt"));
 
 		// was before BFO_0000070
 		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002503"));
@@ -442,19 +441,17 @@ public class ZPGen {
 	 * @param zp
 	 */
 	private static void addSourceInformation(OWLClass cls, ZFINEntry entry, OWLOntology zp) {
+
 		OWLOntologyManager m = zp.getOWLOntologyManager();
 		OWLDataFactory f = m.getOWLDataFactory();
 		OWLAnnotationProperty definitionSourceProperty = f.getOWLAnnotationProperty(definitionSourcePropertyIRI);
 
-		// search for existing source information and remove it
-		Set<OWLAnnotationAssertionAxiom> annotations = zp.getAnnotationAssertionAxioms(cls.getIRI());
-		for (OWLAnnotationAssertionAxiom ann : annotations) {
-			if (definitionSourceProperty.equals(ann.getProperty())) {
-				m.removeAxiom(zp, ann);
-			}
-		}
+		/*
+		 * Should not happen.
+		 */
 		if (entry.sourceString == null) {
 			System.err.println("source string null: " + entry.genxZfinID);
+			return;
 		}
 
 		// add source information

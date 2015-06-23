@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -480,7 +481,7 @@ public class ZPGen {
 				}
 
 				String label = null;
-				String source = null;
+				ArrayList<String> sources = new ArrayList<String>();
 
 				for (OWLAnnotation annotation : cls.getAnnotations(zp)) {
 
@@ -488,21 +489,25 @@ public class ZPGen {
 					OWLAnnotationProperty property = annotation.getProperty();
 					IRI propertyIri = property.getIRI();
 
-					if (propertyIri.equals(definitionSourcePropertyIRI))
-						source = ((OWLLiteral) value).getLiteral();
+					if (propertyIri.equals(definitionSourcePropertyIRI)) {
+						String source = ((OWLLiteral) value).getLiteral();
+						sources.add(source);
+					}
 
 					if (property.isLabel())
 						label = ((OWLLiteral) value).getLiteral();
 				}
 
 				// write the information
-				if (label != null && source != null) {
-					writer.append(zpID);
-					writer.append('\t');
-					writer.append(label);
-					writer.append('\t');
-					writer.append(source);
-					writer.append('\n');
+				if (label != null && sources.size() > 0) {
+					for (String source : sources) {
+						writer.append(zpID);
+						writer.append('\t');
+						writer.append(label);
+						writer.append('\t');
+						writer.append(source);
+						writer.append('\n');
+					}
 				}
 			}
 		} catch (IOException e) {

@@ -7,9 +7,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Provides a method to walkes a ZFIN file. Calls {@link ZFINVisitor#visit(ZFINEntry)} for each encountered entry.
+ * Provides a method to walk a ZFIN file. Calls
+ * {@link ZFINVisitor#visit(ZFINEntry)} for each encountered entry.
  * 
- * See http://zfin.org/downloads for a current format (pheno.txt and phenotype.txt).
+ * See http://zfin.org/downloads for a current format (pheno.txt and
+ * phenotype.txt).
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
@@ -131,10 +133,10 @@ public class ZFINWalker {
 					entry.patoName = sp[PHENO_TXT_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENO_TXT_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
 
-					// fix bug with 7 entries that use wrong phenotype-tag (usually only normal/abnormal allowed)
+					// fix bug with 7 entries that use wrong phenotype-tag
+					// (usually only normal/abnormal allowed)
 					checkPhenotypeTag(sp[PHENO_TXT_COLUMN_PATO_MODIFIER], entry);
-				}
-				else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
+				} else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
 
 					entry.genxZfinID = sp[PHENOTYPE_TXT_COLUMN_ZFIN_GENO_ID];
 
@@ -152,19 +154,18 @@ public class ZFINWalker {
 					entry.patoName = sp[PHENOTYPE_TXT_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
 
-				}
-				else {
+				} else {
 					throw new IllegalArgumentException("Unrecognized zfin-file-type: " + zfinFileType);
 				}
 
 				// create the source string NOW
 				entry.sourceString = generateSourceString(entry);
 
-				// fix bug with 7 entries that use wrong phenotype-tag (usually only normal/abnormal allowed)
+				// fix bug with 7 entries that use wrong phenotype-tag (usually
+				// only normal/abnormal allowed)
 				if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_TXT)) {
 					checkPhenotypeTag(sp[PHENO_TXT_COLUMN_PATO_MODIFIER], entry);
-				}
-				else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
+				} else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENOTYPE_TXT)) {
 					checkPhenotypeTag(sp[PHENOTYPE_TXT_COLUMN_PATO_MODIFIER], entry);
 				}
 
@@ -202,8 +203,7 @@ public class ZFINWalker {
 		// phenotype_modifier, currently always abnormal or normal
 		if (entry.isAbnormal) {
 			source.append("PATO:0000460"); // abnormal
-		}
-		else {
+		} else {
 			source.append("PATO:0000461"); // normal
 		}
 		source.append('\t');

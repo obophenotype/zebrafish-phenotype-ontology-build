@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
  * Simple zp id registry.
  * 
  * @author Sebastian Bauer
+ * @author Heiko Dietze
  */
 public class ZPIDDB {
 	private static Logger log = Logger.getAnonymousLogger();

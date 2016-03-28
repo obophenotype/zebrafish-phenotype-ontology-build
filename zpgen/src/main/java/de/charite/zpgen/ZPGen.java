@@ -51,6 +51,8 @@ import de.charite.zpgen.ZFINWalker.ZFIN_FILE_TYPE;
  * The purpose of this tool is to create an ontology from the definitions that
  * can be found in the files
  * 
+ * Supports also negative annotations.
+ * 
  * <pre>
  * http://zfin.org/downloads/pheno.txt
  * http://zfin.org/downloads/phenotype.txt

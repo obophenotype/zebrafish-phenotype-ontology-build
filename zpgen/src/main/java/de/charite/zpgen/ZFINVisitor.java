@@ -5,8 +5,8 @@ import java.io.BufferedWriter;
 /**
  * The visitor interface.
  * 
- * @author Sebastian Köhler
- *
+ * @author Sebastian Bauer
+ * @author Sebastian Koehler
  */
 public interface ZFINVisitor {
 	/**

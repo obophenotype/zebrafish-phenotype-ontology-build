@@ -101,6 +101,7 @@ public class ZPGen {
 		/* Load the previous zp, if requested */
 		final OWLOntology zp;
 		if (keepIds) {
+			System.out.println("loading previous zp-ontology...");
 			File ontoFile = new File(previousOntologyFilePath);
 			if (ontoFile.exists()) {
 				zp = manager.loadOntologyFromOntologyDocument(ontoFile);
@@ -114,25 +115,8 @@ public class ZPGen {
 
 			}
 
-			/*
-			 * Maybe for later use. Ensure that each class has exactly one label
-			 */
-			// HashSet<String> seenAxioms = new HashSet<String>();
-			// int removed = 0;
-			// // debug ... fix duplicated labels
-			// Set<OWLAnnotationAssertionAxiom> axioms =
-			// zp.getAxioms(AxiomType.ANNOTATION_ASSERTION);
-			// for (OWLAnnotationAssertionAxiom axiom : axioms) {
-			//
-			// String axiomStr = axiom.toString();
-			// System.out.println("axiom " + axiomStr);
-			// System.out.println(axiom.getProperty());
-			// if (axiom.getProperty().equals(factory.getRDFSLabel())) {
-			// System.out.println("is label");
-			// }
-			// System.out.println("---> " + axiom.getSubject());
-			// }
 		} else {
+			System.out.println("creating new zp-ontology...");
 			zp = manager.createOntology(zpIRI);
 		}
 
@@ -389,8 +373,8 @@ public class ZPGen {
 			zfinVisitor.visit(rootEntry, annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
 			zfinVisitor.visit(rootEntry, annotationPhenotypeTxtOut, negativePhenotypeTxtAnnotationOut);
 		}
-		ZFINWalker.walk(inputStreamPhenoTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_TXT, annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
-		ZFINWalker.walk(inputStreamPhenotypeTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENOTYPE_TXT, annotationPhenotypeTxtOut,
+		ZFINWalker.walk(inputStreamPhenoTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENES_TXT, annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
+		ZFINWalker.walk(inputStreamPhenotypeTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT, annotationPhenotypeTxtOut,
 				negativePhenotypeTxtAnnotationOut);
 
 		// if requested, add the equivalence axioms between ZFA-class and

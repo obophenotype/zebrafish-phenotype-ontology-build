@@ -7,8 +7,6 @@ In order to allow existing algorithm and tools (semantic similarity, enrichment,
 
 We create an ontology of zebrafish phenotypes obtained from http://zfin.org/downloads
 
-Two-level approach
-
   * Building up the axioms
     * EQ approach
     * Preserve IDs by loading previously generated axioms

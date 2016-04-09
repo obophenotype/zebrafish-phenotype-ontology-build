@@ -83,7 +83,7 @@ public class ZPGen {
 		final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
 		final String annotFilesFolder = zpCLIConfig.annotationsFolder;
 		final boolean keepIds = zpCLIConfig.keepIds;
-		final boolean useInheresInPartOf = zpCLIConfig.useInheresInPartOf;
+//		final boolean useInheresInPartOf = zpCLIConfig.useInheresInPartOf;
 		final boolean useOwlRdfSyntax = zpCLIConfig.useOwlRdfSyntax;
 
 		final boolean addZfaUberonEquivalencies = zpCLIConfig.addZfaUberonEquivalencies;
@@ -166,13 +166,13 @@ public class ZPGen {
 
 		// I have for now replaced the BFO-properties with the RO-properties
 		final OWLObjectProperty inheresProperty;
-		if (useInheresInPartOf) {
-			// inheres in part of
-			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002314"));
-		} else {
+//		if (useInheresInPartOf) {
+//			// inheres in part of
+//			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002314"));
+//		} else {
 			// inheres in (was before BFO_0000052)
 			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
-		}
+//		}
 
 		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000051"));
 

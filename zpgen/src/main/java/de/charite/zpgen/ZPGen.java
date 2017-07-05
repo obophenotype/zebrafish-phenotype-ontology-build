@@ -196,7 +196,7 @@ public class ZPGen {
      * Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to collate the
      * classes properly. (There is no reasoner used at the moment We also emit the annotations here.
      */
-    class ZFIN implements ZFINVisitor {
+    class ZFIN implements ZfinVisitor {
 
       /**
        * Returns an entity class for the given obo id. This is a simple wrapper for

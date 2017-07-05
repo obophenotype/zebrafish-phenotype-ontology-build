@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Provides a method to walk a ZFIN file. Calls {@link ZFINVisitor#visit(ZfinEntry)} for each
+ * Provides a method to walk a ZFIN file. Calls {@link ZfinVisitor#visit(ZfinEntry)} for each
  * encountered entry.
  * 
  * See http://zfin.org/downloads for current format. This changes a lot...
@@ -108,7 +108,7 @@ public class ZFINWalker {
   private static final int PHENO_GENE_COLUMN_PATO_NAME = 10;
   private static final int PHENO_GENE_COLUMN_PATO_MODIFIER = 11;
 
-  static public void walk(InputStream input, ZFINVisitor visitor, ZFIN_FILE_TYPE zfinFileType,
+  static public void walk(InputStream input, ZfinVisitor visitor, ZFIN_FILE_TYPE zfinFileType,
       BufferedWriter outPositiveAnnotations, BufferedWriter outNegativeAnnotations)
       throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(input));

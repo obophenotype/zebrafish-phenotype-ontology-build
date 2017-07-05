@@ -3,7 +3,7 @@ package de.charite.zpgen;
 import com.beust.jcommander.JCommander;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Lists;
-import de.charite.zpgen.ZfinWalker.ZFIN_FILE_TYPE;
+import de.charite.zpgen.ZfinWalker.ZfinFileType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -388,9 +388,9 @@ public class ZpGen {
       zfinVisitor.visit(rootEntry, annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
       zfinVisitor.visit(rootEntry, annotationPhenotypeTxtOut, negativePhenotypeTxtAnnotationOut);
     }
-    ZfinWalker.walk(inputStreamPhenoTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENES_TXT,
+    ZfinWalker.walk(inputStreamPhenoTxt, zfinVisitor, ZfinFileType.PHENO_GENES_TXT,
         annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
-    ZfinWalker.walk(inputStreamPhenotypeTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT,
+    ZfinWalker.walk(inputStreamPhenotypeTxt, zfinVisitor, ZfinFileType.PHENO_GENOTYPES_TXT,
         annotationPhenotypeTxtOut, negativePhenotypeTxtAnnotationOut);
 
     // if requested, add the equivalence axioms between ZFA-class and

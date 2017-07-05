@@ -7,108 +7,210 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Provides a method to walk a ZFIN file. Calls {@link ZfinVisitor#visit(ZfinEntry)} for each
- * encountered entry.
+ * Provides a static method to walk a ZFIN file.
  * 
- * See http://zfin.org/downloads for current format. This changes a lot...
+ * <p>
+ * Calls {@link ZfinVisitor#visit(ZfinEntry)} for each encountered entry.
+ * </p>
+ *
+ * <p>
+ * See http://zfin.org/downloads for current format. This changes a lot.
+ * </p>
+ *
+ * <h5>Phenotype-Genotype File Format</h5>
+ *
+ * <p>
+ * The current file format for http://zfin.org/downloads/phenotype_fish.txt as of: 2015.
+ * </p>
+ *
+ * <ul>
+ * <li>0 Fish ID</li>
+ * <li>1 Fish Name</li>
+ * <li>2 Start Stage ID</li>
+ * <li>3 Start Stage Name</li>
+ * <li>4 End Stage ID</li>
+ * <li>5 End Stage Name</li>
+ * <li>6 Affected Structure or Process 1 subterm ID</li>
+ * <li>7 Affected Structure or Process 1 subterm Name</li>
+ * <li>8 Post-composed Relationship ID</li>
+ * <li>9 Post-composed Relationship Name</li>
+ * <li>10 Affected Structure or Process 1 superterm ID</li>
+ * <li>11 Affected Structure or Process 1 superterm Name</li>
+ * <li>12 Phenotype Keyword ID</li>
+ * <li>13 Phenotype Keyword Name</li>
+ * <li>14 Phenotype Tag</li>
+ * <li>15 Affected Structure or Process 2 subterm ID</li>
+ * <li>16 Affected Structure or Process 2 subterm name</li>
+ * <li>17 Post-composed Relationship (rel) ID</li>
+ * <li>18 Post-composed Relationship (rel) Name</li>
+ * <li>19 Affected Structure or Process 2 superterm ID</li>
+ * <li>20 Affected Structure or Process 2 superterm name</li>
+ * <li>21 Publication ID</li>
+ * <li>22 Environment ID</li>
+ * </ul>
+ * 
+ * <h5>Phenotype-Gene File Format</h5>
+ * 
+ * <p>
+ * The current file format for http://zfin.org/downloads/phenoGeneCleanData_fish.txt as of: Jul 2017
+ * </p>
+ * 
+ * <ul>
+ * <li>0 ID</li>
+ * <li>1 Gene Symbol</li>
+ * <li>2 Gene ID</li>
+ * <li>3 Affected Structure or Process 1 subterm ID</li>
+ * <li>4 Affected Structure or Process 1 subterm Name</li>
+ * <li>5 Post-composed Relationship ID</li>
+ * <li>6 Post-composed Relationship Name</li>
+ * <li>7 Affected Structure or Process 1 superterm ID</li>
+ * <li>8 Affected Structure or Process 1 superterm Name</li>
+ * <li>9 Phenotype Keyword ID</li>
+ * <li>10 Phenotype Keyword Name</li>
+ * <li>11 Phenotype Tag</li>
+ * <li>12 Affected Structure or Process 2 subterm ID</li>
+ * <li>13 Affected Structure or Process 2 subterm name</li>
+ * <li>14 Post-composed Relationship (rel) ID</li>
+ * <li>15 Post-composed Relationship (rel) Name</li>
+ * <li>16 Affected Structure or Process 2 superterm ID</li>
+ * <li>17 Affected Structure or Process 2 superterm name</li>
+ * <li>18 Fish ID</li>
+ * <li>19 Fish Display Name</li>
+ * <li>20 Start Stage ID</li>
+ * <li>21 End Stage ID</li>
+ * <li>22 Fish Environment ID</li>
+ * <li>23 Publication ID</li>
+ * <li>24 Figure ID</li>
+ * </ul>
  * 
  * @author Sebastian Bauer
  * @author Sebastian Koehler
  */
-public class ZfinWalker {
-
-  private ZfinWalker() {};
-
-  public static enum ZFIN_FILE_TYPE {
-    PHENO_GENES_TXT, PHENO_GENOTYPES_TXT
-  };
+public final class ZfinWalker {
 
   /**
-   * The current file format for http://zfin.org/downloads/phenotype_fish.txt as of: 2015<br>
-   * 0 Fish ID<br>
-   * 1 Fish Name<br>
-   * 2 Start Stage ID<br>
-   * 3 Start Stage Name<br>
-   * 4 End Stage ID<br>
-   * 5 End Stage Name<br>
-   * 6 Affected Structure or Process 1 subterm ID<br>
-   * 7 Affected Structure or Process 1 subterm Name<br>
-   * 8 Post-composed Relationship ID<br>
-   * 9 Post-composed Relationship Name<br>
-   * 10 Affected Structure or Process 1 superterm ID<br>
-   * 11 Affected Structure or Process 1 superterm Name<br>
-   * 12 Phenotype Keyword ID<br>
-   * 13 Phenotype Keyword Name<br>
-   * 14 Phenotype Tag<br>
-   * 15 Affected Structure or Process 2 subterm ID<br>
-   * 16 Affected Structure or Process 2 subterm name<br>
-   * 17 Post-composed Relationship (rel) ID<br>
-   * 18 Post-composed Relationship (rel) Name<br>
-   * 19 Affected Structure or Process 2 superterm ID<br>
-   * 20 Affected Structure or Process 2 superterm name<br>
-   * 21 Publication ID<br>
-   * 22 Environment ID<br>
+   * Enumeration type for the precise file type.
    */
+  public static enum ZfinFileType {
+    /** Phenotype-to-gene mapping. */
+    PHENO_GENES_TXT,
+    /** Phenotype-to-genotype mapping name. */
+    PHENO_GENOTYPES_TXT;
+  }
+
+
+  /** Column for fish ID. */
   private static final int PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID = 0;
+
+  /** Column for affected Structure or Process 1 subterm ID. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUBTERM_ID = 6;
+
+  /** Column for affected Structure or Process 1 subterm name. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUBTERM_NAME = 7;
+
+  /** Column for affected Structure or Process 1 superterm ID. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_ID = 10;
+
+  /** Column for affected Structure or Process 1 superterm name. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_NAME = 11;
 
+  /** Column for affected Structure or Process 2 subterm ID. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_ID = 15;
+
+  /** Column for affected Structure or Process 2 subterm name. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_NAME = 16;
+
+  /** Column for affected Structure or Process 2 superterm ID. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUPERTERM_ID = 19;
+
+  /** Column for affected Structure or Process 2 superterm name. */
   private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUPERTERM_NAME = 20;
 
+  /** Column for phenotype keyword ID. */
   private static final int PHENO_GENOTYPES_COLUMN_PATO_ID = 12;
+
+  /** Column for phenotype keyword name. */
   private static final int PHENO_GENOTYPES_COLUMN_PATO_NAME = 13;
+
+  /** Column for phenotype tag. */
   private static final int PHENO_GENOTYPES_COLUMN_PATO_MODIFIER = 14;
 
-  /**
-   * The current file format for http://zfin.org/downloads/phenoGeneCleanData_fish.txt as of: Jul
-   * 2017<br>
-   * 0 ID<br>
-   * 1 Gene Symbol<br>
-   * 2 Gene ID<br>
-   * 3 Affected Structure or Process 1 subterm ID<br>
-   * 4 Affected Structure or Process 1 subterm Name<br>
-   * 5 Post-composed Relationship ID<br>
-   * 6 Post-composed Relationship Name<br>
-   * 7 Affected Structure or Process 1 superterm ID<br>
-   * 8 Affected Structure or Process 1 superterm Name<br>
-   * 9 Phenotype Keyword ID<br>
-   * 10 Phenotype Keyword Name<br>
-   * 11 Phenotype Tag<br>
-   * 12 Affected Structure or Process 2 subterm ID<br>
-   * 13 Affected Structure or Process 2 subterm name<br>
-   * 14 Post-composed Relationship (rel) ID<br>
-   * 15 Post-composed Relationship (rel) Name<br>
-   * 16 Affected Structure or Process 2 superterm ID<br>
-   * 17 Affected Structure or Process 2 superterm name<br>
-   * 18 Fish ID<br>
-   * 19 Fish Display Name<br>
-   * 20 Start Stage ID<br>
-   * 21 End Stage ID<br>
-   * 22 Fish Environment ID<br>
-   * 23 Publication ID<br>
-   * 24 Figure ID
-   */
+  // Column indices for phenotype-to-gene columns.
+
+  // * <ul>
+  // * <li>0 ID</li>
+  // * <li>1 Gene Symbol</li>
+  // * <li>2 Gene ID</li>
+  // * <li>3 Affected Structure or Process 1 subterm ID</li>
+  // * <li>4 Affected Structure or Process 1 subterm Name</li>
+  // * <li>5 Post-composed Relationship ID</li>
+  // * <li>6 Post-composed Relationship Name</li>
+  // * <li>7 Affected Structure or Process 1 superterm ID</li>
+  // * <li>8 Affected Structure or Process 1 superterm Name</li>
+  // * <li>9 Phenotype Keyword ID</li>
+  // * <li>10 Phenotype Keyword Name</li>
+  // * <li>11 Phenotype Tag</li>
+  // * <li>12 Affected Structure or Process 2 subterm ID</li>
+  // * <li>13 Affected Structure or Process 2 subterm name</li>
+  // * <li>14 Post-composed Relationship (rel) ID</li>
+  // * <li>15 Post-composed Relationship (rel) Name</li>
+  // * <li>16 Affected Structure or Process 2 superterm ID</li>
+  // * <li>17 Affected Structure or Process 2 superterm name</li>
+  // * <li>18 Fish ID</li>
+  // * <li>19 Fish Display Name</li>
+  // * <li>20 Start Stage ID</li>
+  // * <li>21 End Stage ID</li>
+  // * <li>22 Fish Environment ID</li>
+  // * <li>23 Publication ID</li>
+  // * <li>24 Figure ID</li>
+
+  /** Column for zebrafish gene ID. */
   private static final int PHENO_GENE_COLUMN_ZFIN_GENE_ID = 2;
+
+  /** Column for affected structure or process 1 subterm ID. */
   private static final int PHENO_GENE_COLUMN_TERM1_SUBTERM_ID = 3;
+
+  /** Column for affected structure or process 1 subterm name. */
   private static final int PHENO_GENE_COLUMN_TERM1_SUBTERM_NAME = 4;
+
+  /** Column for affected structure or process 1 superterm ID. */
   private static final int PHENO_GENE_COLUMN_TERM1_SUPERTERM_ID = 7;
+
+  /** Column for affected structure or process 1 superterm name. */
   private static final int PHENO_GENE_COLUMN_TERM1_SUPERTERM_NAME = 8;
 
+  /** Column for affected structure or process 2 subterm ID. */
   private static final int PHENO_GENE_COLUMN_TERM2_SUBTERM_ID = 12;
+
+  /** Column for affected structure or process 2 subterm name. */
   private static final int PHENO_GENE_COLUMN_TERM2_SUBTERM_NAME = 13;
+
+  /** Column for affected structure or process 2 superterm ID. */
   private static final int PHENO_GENE_COLUMN_TERM2_SUPERTERM_ID = 16;
+
+  /** Column for affected structure or process 2 superterm name. */
   private static final int PHENO_GENE_COLUMN_TERM2_SUPERTERM_NAME = 17;
 
+  /** Column for phenotype keyword ID. */
   private static final int PHENO_GENE_COLUMN_PATO_ID = 9;
+
+  /** Column for phenotype keyword name. */
   private static final int PHENO_GENE_COLUMN_PATO_NAME = 10;
+
+  /** Column for phenotype tag. */
   private static final int PHENO_GENE_COLUMN_PATO_MODIFIER = 11;
 
-  static public void walk(InputStream input, ZfinVisitor visitor, ZFIN_FILE_TYPE zfinFileType,
+  /**
+   * Read ZFIN file with a {@link ZfinVisitor}.
+   *
+   * @param input {@link InputStream} to read from.
+   * @param visitor {@link ZfinVisitor} to use for visiting.
+   * @param zfinFileType {@link ZfinFileType} to select input file type.
+   * @param outPositiveAnnotations {@link BufferedWriter} to write the positive annotations to.
+   * @param outNegativeAnnotations {@link BufferedWriter} to write the negative annotations to.
+   * @throws IOException In case of problems with I/O.
+   */
+  public static void walk(InputStream input, ZfinVisitor visitor, ZfinFileType zfinFileType,
       BufferedWriter outPositiveAnnotations, BufferedWriter outNegativeAnnotations)
       throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(input));
@@ -117,12 +219,13 @@ public class ZfinWalker {
       try {
         ZfinEntry entry = new ZfinEntry();
         String[] sp = null;
-        if (line.contains("|"))
+        if (line.contains("|")) {
           sp = line.split("\\|", -1);
-        else
+        } else {
           sp = line.split("\t", -1);
+        }
 
-        if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENES_TXT)) {
+        if (zfinFileType.equals(ZfinFileType.PHENO_GENES_TXT)) {
           entry.genxZfinId = sp[PHENO_GENE_COLUMN_ZFIN_GENE_ID];
 
           entry.entity1SupertermId = sp[PHENO_GENE_COLUMN_TERM1_SUPERTERM_ID];
@@ -140,9 +243,7 @@ public class ZfinWalker {
           entry.isAbnormal = sp[PHENO_GENE_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
 
           checkPhenotypeTag(sp[PHENO_GENE_COLUMN_PATO_MODIFIER], entry);
-
-        } else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT)) {
-
+        } else if (zfinFileType.equals(ZfinFileType.PHENO_GENOTYPES_TXT)) {
           entry.genxZfinId = sp[PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID];
 
           entry.entity1SupertermId = sp[PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_ID];
@@ -175,11 +276,29 @@ public class ZfinWalker {
     }
   }
 
+  /**
+   * Check the phenotype tag and perform static fix of {@code entry}.
+   *
+   * <p>
+   * In case of problems, an error is written to <code>stderr</code>.
+   * </p>
+   *
+   * <h5>Note</h5>
+   *
+   * <p>
+   * Contains update code if {@code string} is {@code "absent"} and the entity 1 super term id of
+   * {@code entry} is {@code "GO:0007601"}, then updates the entry.
+   * </p>
+   *
+   * @param string The phenotype tag to check.
+   * @param entry The entry to process, and check.
+   */
   private static void checkPhenotypeTag(String string, ZfinEntry entry) {
     if (!(string.equals("abnormal") || string.equals("normal"))) {
       System.err.println("wrong format for entry " + entry.genxZfinId
           + " expected normal/abnormal, found '" + string + "'");
     }
+
     if (string.equals("absent") && entry.entity1SupertermId.equals("GO:0007601")) {
       entry.isAbnormal = true;
       entry.patoId = "PATO:0000462";
@@ -187,6 +306,12 @@ public class ZfinWalker {
     }
   }
 
+  /**
+   * Generate a source string from a {@link ZfinEntry}.
+   *
+   * @param entry The {@link ZfinEntry} to generate source string for.
+   * @return {@code String} with the corresponding source string.
+   */
   public static String generateSourceString(ZfinEntry entry) {
     StringBuilder source = new StringBuilder();
     source.append(entry.entity1SupertermId); // affected_structure_or_process_1_superterm_id

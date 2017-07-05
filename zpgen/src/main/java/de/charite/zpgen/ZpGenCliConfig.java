@@ -8,7 +8,7 @@ import com.beust.jcommander.Parameter;
  * @author Sebastian Bauer
  * @author Sebastian Köhler
  */
-public class ZPGenCLIConfig {
+public class ZpGenCliConfig {
   @Parameter(names = {
       "--zfin-pheno-txt-input-file"}, required = true, description = "The file containing the decomposed phenotype - gene associations (i.e. http://zfin.org/downloads/pheno.txt)")
   public String zfinPhenoTxtPath;

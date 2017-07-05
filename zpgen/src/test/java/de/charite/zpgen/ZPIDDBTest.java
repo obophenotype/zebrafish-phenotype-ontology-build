@@ -34,7 +34,7 @@ public class ZPIDDBTest {
 
 		final OWLOntology testOntology = manager.createOntology(IRI.create("test"));
 
-		ZPIDDB zpIdDB = new ZPIDDB();
+		ZpIdDb zpIdDB = new ZpIdDb();
 
 		OWLClass pato = factory.getOWLClass(IRI.create("PATO:1"));
 		OWLClass cl1 = factory.getOWLClass(IRI.create("TEST:1"));
@@ -72,7 +72,7 @@ public class ZPIDDBTest {
 		final OWLOntologyManager manager2 = OWLManager.createOWLOntologyManager();
 		OWLOntology testOntology2 = manager2.loadOntologyFromOntologyDocument(bais);
 
-		ZPIDDB zpIdDB2 = new ZPIDDB(testOntology2);
+		ZpIdDb zpIdDB2 = new ZpIdDb(testOntology2);
 		OWLDataFactory factory2 = manager.getOWLDataFactory();
 		OWLClass cl21 = factory2.getOWLClass(IRI.create("TEST:1"));
 		OWLClass cl22 = factory2.getOWLClass(IRI.create("TEST:2"));

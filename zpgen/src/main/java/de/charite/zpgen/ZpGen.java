@@ -42,7 +42,7 @@ import com.beust.jcommander.JCommander;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Lists;
 
-import de.charite.zpgen.ZFINWalker.ZFIN_FILE_TYPE;
+import de.charite.zpgen.ZfinWalker.ZFIN_FILE_TYPE;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from decomposed phenotype -
@@ -62,16 +62,16 @@ import de.charite.zpgen.ZFINWalker.ZFIN_FILE_TYPE;
  * @author Sebastian Bauer
  * @author Heiko Dietze
  */
-public class ZPGen {
-  static private Logger log = Logger.getLogger(ZPGen.class.getName());
+public class ZpGen {
+  static private Logger log = Logger.getLogger(ZpGen.class.getName());
 
   public static void main(String[] args) throws OWLOntologyCreationException, IOException,
       InterruptedException, OWLOntologyStorageException {
-    ZPGenCLIConfig zpCLIConfig = new ZPGenCLIConfig();
+    ZpGenCliConfig zpCLIConfig = new ZpGenCliConfig();
     JCommander jc = new JCommander(zpCLIConfig);
     jc.parse(args);
 
-    jc.setProgramName(ZPGen.class.getSimpleName());
+    jc.setProgramName(ZpGen.class.getSimpleName());
     if (zpCLIConfig.help) {
       jc.usage();
       System.exit(0);
@@ -155,7 +155,7 @@ public class ZPGen {
     }
 
     /* Instanciate the zpid db */
-    final ZPIDDB zpIdDB = new ZPIDDB(zp);
+    final ZpIdDb zpIdDB = new ZpIdDb(zp);
 
     /* Where to write the annotation file to */
     final BufferedWriter annotationPhenoTxtOut =
@@ -374,9 +374,9 @@ public class ZPGen {
       zfinVisitor.visit(rootEntry, annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
       zfinVisitor.visit(rootEntry, annotationPhenotypeTxtOut, negativePhenotypeTxtAnnotationOut);
     }
-    ZFINWalker.walk(inputStreamPhenoTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENES_TXT,
+    ZfinWalker.walk(inputStreamPhenoTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENES_TXT,
         annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
-    ZFINWalker.walk(inputStreamPhenotypeTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT,
+    ZfinWalker.walk(inputStreamPhenotypeTxt, zfinVisitor, ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT,
         annotationPhenotypeTxtOut, negativePhenotypeTxtAnnotationOut);
 
     // if requested, add the equivalence axioms between ZFA-class and
@@ -427,7 +427,7 @@ public class ZPGen {
     rootEntry.entity1SupertermId = rootId;// "ZFA:0100000";
     rootEntry.entity1SupertermName = rootLabel;// "zebrafish anatomical entity";
     rootEntry.entity2SupertermId = "";
-    rootEntry.sourceString = ZFINWalker.generateSourceString(rootEntry);
+    rootEntry.sourceString = ZfinWalker.generateSourceString(rootEntry);
     return rootEntry;
   }
 

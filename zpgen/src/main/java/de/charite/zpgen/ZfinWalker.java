@@ -15,9 +15,9 @@ import java.io.InputStreamReader;
  * @author Sebastian Bauer
  * @author Sebastian Koehler
  */
-public class ZFINWalker {
+public class ZfinWalker {
 
-  private ZFINWalker() {};
+  private ZfinWalker() {};
 
   public static enum ZFIN_FILE_TYPE {
     PHENO_GENES_TXT, PHENO_GENOTYPES_TXT

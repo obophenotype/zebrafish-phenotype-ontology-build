@@ -14,15 +14,17 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
- * Simple zp id registry.
+ * Simple database for ZPO identifiers.
  * 
  * @author Sebastian Bauer
  * @author Heiko Dietze
  */
-public class ZPIDDB {
-  private static Logger log = Logger.getAnonymousLogger();
+public class ZpIdDb {
+  
+  /** The {@link Logger} to use for log genreation. */
+  private static Logger LOGGER = Logger.getAnonymousLogger();
 
-  /** Next id to be assigned in case of an unknown class expression */
+  /** Next id to be assigned in case of an unknown class expression. */
   private int nextId = 1;
 
   /** Every class expression gets an own distinct id, which is stored here */
@@ -31,7 +33,7 @@ public class ZPIDDB {
   /**
    * Constructs an empty zp id database.
    */
-  public ZPIDDB() {
+  public ZpIdDb() {
     this(null);
   }
 
@@ -41,14 +43,14 @@ public class ZPIDDB {
    * 
    * @param zp
    */
-  public ZPIDDB(OWLOntology zp) {
+  public ZpIdDb(OWLOntology zp) {
     if (zp != null) {
       for (OWLAxiom ax : zp.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
         if (ax instanceof OWLEquivalentClassesAxiom) {
           OWLEquivalentClassesAxiom eq = (OWLEquivalentClassesAxiom) ax;
           List<OWLClassExpression> exprList = eq.getClassExpressionsAsList();
           if (exprList.size() != 2) {
-            log.warning("Unknown format in equivalence axiom: " + eq);
+            LOGGER.warning("Unknown format in equivalence axiom: " + eq);
             continue;
           }
           OWLClassExpression cl1 = exprList.get(0);
@@ -59,14 +61,14 @@ public class ZPIDDB {
           if (cl1 instanceof OWLClass)
             zpClass = (OWLClass) cl1;
           else {
-            log.warning("Unknown format in equivalence axiom: " + eq);
+            LOGGER.warning("Unknown format in equivalence axiom: " + eq);
             continue;
           }
 
           IRI zpIRI = zpClass.getIRI();
           String zpID = OBOVocabulary.IRI2ID(zpIRI);
           if (!zpID.startsWith("ZP:")) {
-            log.warning("Unknown term name in equivalence axiom: " + eq);
+            LOGGER.warning("Unknown term name in equivalence axiom: " + eq);
             continue;
           }
           int id = Integer.parseInt(zpID.substring(3));
@@ -75,7 +77,7 @@ public class ZPIDDB {
           class2Id.put(cl2, zpIRI);
         }
       }
-      log.info((nextId - 1) + " previous ids recovered");
+      LOGGER.info((nextId - 1) + " previous ids recovered");
     }
   }
 

@@ -123,7 +123,7 @@ public class ZFINWalker {
           sp = line.split("\t", -1);
 
         if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENES_TXT)) {
-          entry.genxZfinID = sp[PHENO_GENE_COLUMN_ZFIN_GENE_ID];
+          entry.genxZfinId = sp[PHENO_GENE_COLUMN_ZFIN_GENE_ID];
 
           entry.entity1SupertermId = sp[PHENO_GENE_COLUMN_TERM1_SUPERTERM_ID];
           entry.entity1SupertermName = sp[PHENO_GENE_COLUMN_TERM1_SUPERTERM_NAME];
@@ -143,7 +143,7 @@ public class ZFINWalker {
 
         } else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT)) {
 
-          entry.genxZfinID = sp[PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID];
+          entry.genxZfinId = sp[PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID];
 
           entry.entity1SupertermId = sp[PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_ID];
           entry.entity1SupertermName = sp[PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_NAME];
@@ -177,7 +177,7 @@ public class ZFINWalker {
 
   private static void checkPhenotypeTag(String string, ZfinEntry entry) {
     if (!(string.equals("abnormal") || string.equals("normal"))) {
-      System.err.println("wrong format for entry " + entry.genxZfinID
+      System.err.println("wrong format for entry " + entry.genxZfinId
           + " expected normal/abnormal, found '" + string + "'");
     }
     if (string.equals("absent") && entry.entity1SupertermId.equals("GO:0007601")) {

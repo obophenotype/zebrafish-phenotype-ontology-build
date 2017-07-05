@@ -350,9 +350,9 @@ public class ZPGen {
         try {
           // write negative (not-) annotations to a different file
           if (!entry.isAbnormal) {
-            outNegativeAnnotations.write(entry.genxZfinID + "\t" + zpID + "\t" + label + "\tNOT\n");
+            outNegativeAnnotations.write(entry.genxZfinId + "\t" + zpID + "\t" + label + "\tNOT\n");
           } else {
-            outPositiveAnnotations.write(entry.genxZfinID + "\t" + zpID + "\t" + label + "\n");
+            outPositiveAnnotations.write(entry.genxZfinId + "\t" + zpID + "\t" + label + "\n");
           }
         } catch (IOException e) {
           e.printStackTrace();
@@ -420,7 +420,7 @@ public class ZPGen {
 
   private static ZfinEntry getRootEntry(String rootId, String rootLabel) {
     ZfinEntry rootEntry = new ZfinEntry();
-    rootEntry.genxZfinID = "DUMMY";
+    rootEntry.genxZfinId = "DUMMY";
     rootEntry.isAbnormal = true;
     rootEntry.patoID = "PATO:0000001";
     rootEntry.patoName = "quality";
@@ -456,7 +456,7 @@ public class ZPGen {
      * Should not happen.
      */
     if (entry.sourceString == null) {
-      System.err.println("source string null: " + entry.genxZfinID);
+      System.err.println("source string null: " + entry.genxZfinId);
       return;
     }
 

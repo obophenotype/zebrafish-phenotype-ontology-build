@@ -7,65 +7,64 @@ import java.io.IOException;
 import com.google.common.collect.ImmutableSetMultimap;
 
 /**
- * Create a mapping of ZFA-class-IDs to UBERON-class-IDs using the UBERON in obo
- * format. The UBERON obo file contains xref-tags for the ZFA-classes.
+ * Create a mapping of ZFA-class-IDs to UBERON-class-IDs using the UBERON in obo format. The UBERON
+ * obo file contains xref-tags for the ZFA-classes.
  * 
- * It may be possible that this is not important anymore, as we pull the full
- * ZFA-ontology. But still keep this as an option.
+ * It may be possible that this is not important anymore, as we pull the full ZFA-ontology. But
+ * still keep this as an option.
  * 
  * @author Sebastian Köhler
  *
  */
 public class Zfa2UberonMapper {
 
-	/**
-	 * Using multimap because some ZFA-classes are xref'd by multiple UBERON
-	 * classes
-	 */
-	private ImmutableSetMultimap<String, String> zfa2uberonIm = null;
+  /**
+   * Using multimap because some ZFA-classes are xref'd by multiple UBERON classes
+   */
+  private ImmutableSetMultimap<String, String> zfa2uberonIm = null;
 
-	/**
-	 * @param uberonOboFilePath
-	 */
-	public Zfa2UberonMapper(String uberonOboFilePath) {
-		try {
+  /**
+   * @param uberonOboFilePath
+   */
+  public Zfa2UberonMapper(String uberonOboFilePath) {
+    try {
 
-			BufferedReader in = new BufferedReader(new FileReader(uberonOboFilePath));
-			String line = null;
-			String currentUberonId = null;
-			String currentZfaId = null;
-			// using multimap because some ZFA-classes are used as xref by
-			// multiple UBERON classes
-			ImmutableSetMultimap.Builder<String, String> builder = ImmutableSetMultimap.builder();
-			while ((line = in.readLine()) != null) {
-				line = line.trim();
+      BufferedReader in = new BufferedReader(new FileReader(uberonOboFilePath));
+      String line = null;
+      String currentUberonId = null;
+      String currentZfaId = null;
+      // using multimap because some ZFA-classes are used as xref by
+      // multiple UBERON classes
+      ImmutableSetMultimap.Builder<String, String> builder = ImmutableSetMultimap.builder();
+      while ((line = in.readLine()) != null) {
+        line = line.trim();
 
-				// use empty lines as indicator for new element
-				if (line.equals("")) {
-					if (currentUberonId != null && currentZfaId != null) {
-						builder.put(currentZfaId, currentUberonId);
-					}
-					currentUberonId = null;
-					currentZfaId = null;
-				}
-				if (line.startsWith("id: UBERON:")) {
-					currentUberonId = line.replace("id: ", "");
-				}
-				if (line.startsWith("xref: ZFA:")) {
-					currentZfaId = line.replace("xref: ", "");
-				}
-			}
-			in.close();
+        // use empty lines as indicator for new element
+        if (line.equals("")) {
+          if (currentUberonId != null && currentZfaId != null) {
+            builder.put(currentZfaId, currentUberonId);
+          }
+          currentUberonId = null;
+          currentZfaId = null;
+        }
+        if (line.startsWith("id: UBERON:")) {
+          currentUberonId = line.replace("id: ", "");
+        }
+        if (line.startsWith("xref: ZFA:")) {
+          currentZfaId = line.replace("xref: ", "");
+        }
+      }
+      in.close();
 
-			zfa2uberonIm = builder.build();
+      zfa2uberonIm = builder.build();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-	public ImmutableSetMultimap<String, String> getZfa2UberonMapping() {
-		return zfa2uberonIm;
-	}
+  public ImmutableSetMultimap<String, String> getZfa2UberonMapping() {
+    return zfa2uberonIm;
+  }
 
 }

@@ -1,9 +1,5 @@
 package de.charite.zpgen;
 
-import com.beust.jcommander.JCommander;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Lists;
-import de.charite.zpgen.ZfinWalker.ZfinFileType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +15,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
@@ -40,6 +37,10 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.SetOntologyID;
+
+import com.beust.jcommander.JCommander;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Lists;
 
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from decomposed phenotype -
@@ -66,7 +67,7 @@ import org.semanticweb.owlapi.model.SetOntologyID;
 public class ZpGen {
 
   /** The Logger instance to use. */
-  static private Logger LOGGER = Logger.getLogger(ZpGen.class.getName());
+  private static Logger LOGGER = Logger.getLogger(ZpGen.class.getName());
 
   /**
    * Main entry point.
@@ -76,32 +77,35 @@ public class ZpGen {
    * @throws OWLOntologyCreationException When the OWL ontology could not be created.
    * @throws IOException In case of I/O errors.
    * @throws InterruptedException When an interruption occurs.
-   * @throws OWLOntologyStorageException
+   * @throws OWLOntologyStorageException In case of problems with OWL ontology storage.
    */
   public static void main(String[] args) throws OWLOntologyCreationException, IOException,
       InterruptedException, OWLOntologyStorageException {
-    ZpGenCliConfig zpCLIConfig = new ZpGenCliConfig();
-    JCommander jc = new JCommander(zpCLIConfig);
+    // Parse command line.
+    ZpGenCliConfig zpCliConfig = new ZpGenCliConfig();
+    JCommander jc = new JCommander(zpCliConfig);
     jc.parse(args);
 
+    // Display command line help if requested.
     jc.setProgramName(ZpGen.class.getSimpleName());
-    if (zpCLIConfig.help) {
+    if (zpCliConfig.help) {
       jc.usage();
       System.exit(0);
     }
 
+    // Extract configuration from zpCliConfig.
     final boolean addSourceInformation =
-        zpCLIConfig.addSourceInformation || zpCLIConfig.sourceInformationFile != null;
-    final String zfinPhenoTxtFilePath = zpCLIConfig.zfinPhenoTxtPath;
-    final String zfinPhenotypeTxtFilePath = zpCLIConfig.zfinPhenotypeTxtPath;
-    final String previousOntologyFilePath = zpCLIConfig.previousOntologyFilePath;
-    final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
-    final String annotFilesFolder = zpCLIConfig.annotationsFolder;
-    final boolean keepIds = zpCLIConfig.keepIds;
-    final boolean useOwlRdfSyntax = zpCLIConfig.useOwlRdfSyntax;
+        zpCliConfig.addSourceInformation || zpCliConfig.sourceInformationFile != null;
+    final String zfinPhenoTxtFilePath = zpCliConfig.zfinPhenoTxtPath;
+    final String zfinPhenotypeTxtFilePath = zpCliConfig.zfinPhenotypeTxtPath;
+    final String previousOntologyFilePath = zpCliConfig.previousOntologyFilePath;
+    final String ontologyOutputFilePath = zpCliConfig.ontologyOutputFilePath;
+    final String annotFilesFolder = zpCliConfig.annotationsFolder;
+    final boolean keepIds = zpCliConfig.keepIds;
+    final boolean useOwlRdfSyntax = zpCliConfig.useOwlRdfSyntax;
 
-    final boolean addZfaUberonEquivalencies = zpCLIConfig.addZfaUberonEquivalencies;
-    final String uberonOboFilePath = zpCLIConfig.uberonOboFilePath;
+    final boolean addZfaUberonEquivalencies = zpCliConfig.addZfaUberonEquivalencies;
+    final String uberonOboFilePath = zpCliConfig.uberonOboFilePath;
 
     /* Create ontology manager */
     final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -109,14 +113,14 @@ public class ZpGen {
     final OWLDataFactory factory = manager.getOWLDataFactory();
 
     /* Create IRIs */
-    final IRI zpIRI = IRI.create("http://purl.obolibrary.org/obo/upheno/zp.owl");
-    final IRI purlOboIRI = IRI.create("http://purl.obolibrary.org/obo/");
+    final IRI zpIri = IRI.create("http://purl.obolibrary.org/obo/upheno/zp.owl");
+    final IRI purlOboIri = IRI.create("http://purl.obolibrary.org/obo/");
 
     /* Load the previous zp, if requested */
     final OWLOntology zp;
     if (keepIds) {
       System.out.println("loading previous zp-ontology...");
-      File ontoFile = new File(previousOntologyFilePath);
+      final File ontoFile = new File(previousOntologyFilePath);
       if (ontoFile.exists()) {
         zp = manager.loadOntologyFromOntologyDocument(ontoFile);
       } else {
@@ -127,22 +131,20 @@ public class ZpGen {
             .severe("Could not find file \"" + previousOntologyFilePath + "\" for keeping the ids");
         throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \""
             + previousOntologyFilePath + "\" was found! Prefer to stop here...");
-
       }
-
     } else {
       System.out.println("creating new zp-ontology...");
-      zp = manager.createOntology(zpIRI);
+      zp = manager.createOntology(zpIri);
     }
 
     /*
      * Add version IRI by using the date of construction
      */
-    Date date = new Date();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    IRI versionIRI = IRI
+    final Date date = new Date();
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    IRI versionIri = IRI
         .create("http://purl.obolibrary.org/obo/upheno/releases/" + sdf.format(date) + "/zp.owl");
-    manager.applyChange(new SetOntologyID(zp, new OWLOntologyID(zpIRI, versionIRI)));
+    manager.applyChange(new SetOntologyID(zp, new OWLOntologyID(zpIri, versionIri)));
 
     /*
      * If user wants to have equivalence axioms between ZFA-classes and UBERON-classes we need the
@@ -155,7 +157,8 @@ public class ZpGen {
       if (uberonOboFilePath == null) {
         LOGGER.severe("No uberon-file was provided for creating the ZFA-UBERON-mapping.");
         throw new IllegalArgumentException(
-            "ZFA-UBERON-mapping requested, but no uberon.obo file was provided! Use option --uberon-obo-file. Prefer to stop here...");
+            "ZFA-UBERON-mapping requested, but no uberon.obo file was provided! Use option "
+                + "--uberon-obo-file. Prefer to stop here...");
       }
       File uberonOntoFile = new File(uberonOboFilePath);
       if (!uberonOntoFile.exists()) {
@@ -169,7 +172,7 @@ public class ZpGen {
     }
 
     /* Instanciate the zpid db */
-    final ZpIdDb zpIdDB = new ZpIdDb(zp);
+    final ZpIdDb zpIdDb = new ZpIdDb(zp);
 
     /* Where to write the annotation file to */
     final BufferedWriter annotationPhenoTxtOut =
@@ -183,43 +186,48 @@ public class ZpGen {
 
     // was before BFO_0000070
     final OWLObjectProperty towards =
-        factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002503"));
+        factory.getOWLObjectProperty(IRI.create(purlOboIri + "RO_0002503"));
     final OWLObjectProperty partOf =
-        factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000050"));
+        factory.getOWLObjectProperty(IRI.create(purlOboIri + "BFO_0000050"));
 
     // I have for now replaced the BFO-properties with the RO-properties
     final OWLObjectProperty inheresProperty =
-        factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
+        factory.getOWLObjectProperty(IRI.create(purlOboIri + "RO_0000052"));
 
     final OWLObjectProperty hasPart =
-        factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000051"));
+        factory.getOWLObjectProperty(IRI.create(purlOboIri + "BFO_0000051"));
 
     /* RO_0002180 = "has qualifier" (previously used) */
     /* RO_0002573 = "has modifier" (used in most recent version) */
     // final OWLObjectProperty has_qualifier =
     // factory.getOWLObjectProperty(IRI.create(zpIRI + "RO_0002180"));
     final OWLObjectProperty has_modifier =
-        factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002573"));
-    final OWLClass abnormal = factory.getOWLClass(IRI.create(purlOboIRI + "PATO_0000460"));
+        factory.getOWLObjectProperty(IRI.create(purlOboIri + "RO_0002573"));
+    final OWLClass abnormal = factory.getOWLClass(IRI.create(purlOboIri + "PATO_0000460"));
 
     /* Now walk the file and create instances on the fly */
-    InputStream inputStreamPhenoTxt = new FileInputStream(new File(zfinPhenoTxtFilePath));
-    InputStream inputStreamPhenotypeTxt = new FileInputStream(new File(zfinPhenotypeTxtFilePath));
+    final InputStream inputStreamPhenoTxt = new FileInputStream(new File(zfinPhenoTxtFilePath));
+    final InputStream inputStreamPhenotypeTxt =
+        new FileInputStream(new File(zfinPhenotypeTxtFilePath));
 
-    /*
-     * Constructs an OWLClass and Axioms for each zfin entry. We expect the reasoner to collate the
-     * classes properly. (There is no reasoner used at the moment We also emit the annotations here.
+    /**
+     * Constructs an OWLClass and Axioms for each zfin entry.
+     * 
+     * <p>
+     * We expect the reasoner to collate the classes properly. There is no reasoner used at the
+     * moment. We also emit the annotations here.
+     * </p>
      */
-    class ZFIN implements ZfinVisitor {
+    class Zfin implements ZfinVisitor {
 
       /**
        * Returns an entity class for the given obo id. This is a simple wrapper for
        * OBOVocabulary.ID2IRI(id) but checks whether the term stems from a supported ontology.
        * 
-       * @param id
-       * @return
+       * @param id The OBO ID to get OWLClass for.
+       * @return The resulting {@link OWLClass}.
        */
-      private OWLClass getEntityClassForOBOID(String id) {
+      private OWLClass getEntityClassForOboId(String id) {
 
         // not perfect, but there are only 2 refs to CARO in phenotype.txt
         if (id.equals("CARO:0000010")) { // "anatomical boundary (CARO)"
@@ -227,21 +235,28 @@ public class ZpGen {
         }
 
         if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:")
-            || id.startsWith("MPATH:") || id.startsWith("CHEBI:"))
+            || id.startsWith("MPATH:") || id.startsWith("CHEBI:")) {
           return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
+        }
 
         throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");
       }
 
       /**
-       * Returns an quality class for the given obo id. This is a simple wrapper for
-       * OBOVocabulary.ID2IRI(id) but checks whether the term stems from a supported ontology.
+       * Returns an quality class for the given obo id.
        * 
-       * @param id
-       * @return
+       * <p>
+       * This is a simple wrapper for <code>OBOVocabulary.ID2IRI(id)</code> but checks whether the
+       * term stems from a supported ontology.
+       * </p>
+       * 
+       * @param id The OBO ID to get Quality class for.
+       * @return The resulting OWLClass.
        */
-      private OWLClass getQualiClassForOBOID(String id) {
-        if (id.startsWith("PATO:")) return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
+      private OWLClass getQualiClassForOboId(String id) {
+        if (id.startsWith("PATO:")) {
+          return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
+        }
 
         throw new RuntimeException("Qualifier must be a pato term");
       }
@@ -255,8 +270,9 @@ public class ZpGen {
          */
         if (entry.entity1SupertermId.equals("ZFA:0001439") && entry.patoId.equals("PATO:0000001")
             && entry.entity1SubtermId.equals("") && entry.entity2SupertermId.equals("")
-            && entry.entity2SubtermId.equals(""))
+            && entry.entity2SubtermId.equals("")) {
           return true;
+        }
 
         /*
          * for annotations that are normal we generate the abnormal counterpart. for this we
@@ -267,9 +283,8 @@ public class ZpGen {
         EntryCorrector corrector = new EntryCorrector(entry);
         entry = corrector.getCorrectedEntry();
 
-        OWLClass pato = getQualiClassForOBOID(entry.patoId);
-        OWLClass cl1 = getEntityClassForOBOID(entry.entity1SupertermId);
-        OWLClassExpression intersectionExpression;
+        OWLClass pato = getQualiClassForOboId(entry.patoId);
+        OWLClass cl1 = getEntityClassForOboId(entry.entity1SupertermId);
         String label;
 
         Set<OWLClassExpression> intersectionList = new LinkedHashSet<OWLClassExpression>();
@@ -284,7 +299,7 @@ public class ZpGen {
            * Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND
            * qualifier abnormal
            */
-          OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
+          OWLClass cl2 = getEntityClassForOboId(entry.entity1SubtermId);
 
           intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresProperty, factory
               .getOWLObjectIntersectionOf(cl2, factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
@@ -306,14 +321,14 @@ public class ZpGen {
         /* Entity 2: Create intersections */
         if (entry.entity2SupertermId != null && entry.entity2SupertermId.length() > 0) {
 
-          OWLClass cl3 = getEntityClassForOBOID(entry.entity2SupertermId);
+          OWLClass cl3 = getEntityClassForOboId(entry.entity2SupertermId);
 
           if (entry.entity2SubtermId != null && entry.entity2SubtermId.length() > 0) {
             /*
              * Pattern is (all-some interpretation): <pato> inheres_in (<cl2> part of <cl1>) AND
              * qualifier abnormal
              */
-            OWLClass cl4 = getEntityClassForOBOID(entry.entity2SubtermId);
+            OWLClass cl4 = getEntityClassForOboId(entry.entity2SubtermId);
 
             intersectionList.add(factory.getOWLObjectSomeValuesFrom(towards, factory
                 .getOWLObjectIntersectionOf(cl4, factory.getOWLObjectSomeValuesFrom(partOf, cl3))));
@@ -331,15 +346,16 @@ public class ZpGen {
         }
 
         /* Create intersection */
-        intersectionExpression = factory.getOWLObjectIntersectionOf(intersectionList);
+        OWLClassExpression intersectionExpression =
+            factory.getOWLObjectIntersectionOf(intersectionList);
 
         OWLClassExpression owlSomeClassExp =
             factory.getOWLObjectSomeValuesFrom(hasPart, intersectionExpression);
 
         // get the class
-        IRI zpIRI = zpIdDB.getZpId(owlSomeClassExp);
-        String zpID = OBOVocabulary.IRI2ID(zpIRI);
-        OWLClass zpTerm = factory.getOWLClass(zpIRI);
+        final IRI zpIri = zpIdDb.getZpId(owlSomeClassExp);
+        final String zpId = OBOVocabulary.IRI2ID(zpIri);
+        final OWLClass zpTerm = factory.getOWLClass(zpIri);
 
         /* Make term equivalent to the intersection */
         OWLEquivalentClassesAxiom axiom =
@@ -364,9 +380,9 @@ public class ZpGen {
         try {
           // write negative (not-) annotations to a different file
           if (!entry.isAbnormal) {
-            outNegativeAnnotations.write(entry.genxZfinId + "\t" + zpID + "\t" + label + "\tNOT\n");
+            outNegativeAnnotations.write(entry.genxZfinId + "\t" + zpId + "\t" + label + "\tNOT\n");
           } else {
-            outPositiveAnnotations.write(entry.genxZfinId + "\t" + zpID + "\t" + label + "\n");
+            outPositiveAnnotations.write(entry.genxZfinId + "\t" + zpId + "\t" + label + "\n");
           }
         } catch (IOException e) {
           e.printStackTrace();
@@ -376,7 +392,7 @@ public class ZpGen {
       }
     }
 
-    ZFIN zfinVisitor = new ZFIN();
+    Zfin zfinVisitor = new Zfin();
 
     /* The zp entry that defines the root */
     List<ZfinEntry> rootEntries = Lists.newArrayList();
@@ -427,8 +443,8 @@ public class ZpGen {
     annotationPhenotypeTxtOut.close();
     negativePhenotypeTxtAnnotationOut.close();
 
-    if (zpCLIConfig.sourceInformationFile != null) {
-      saveSourceInformation(zp, zpCLIConfig.sourceInformationFile);
+    if (zpCliConfig.sourceInformationFile != null) {
+      saveSourceInformation(zp, zpCliConfig.sourceInformationFile);
     }
   }
 
@@ -455,37 +471,34 @@ public class ZpGen {
    * Add the source information for the definition of the equivalent class expression for the given
    * ZP class.
    * 
-   * @param cls
-   * @param entry
-   * @param zp
+   * @param cls The {@link OWLClass} with the equivalence class.
+   * @param entry The {@link ZfinEntry} to add for.
+   * @param zp The ZP ontology to add to.
    */
   private static void addSourceInformation(OWLClass cls, ZfinEntry entry, OWLOntology zp) {
-
-    OWLOntologyManager m = zp.getOWLOntologyManager();
-    OWLDataFactory f = m.getOWLDataFactory();
-    OWLAnnotationProperty definitionSourceProperty =
+    final OWLOntologyManager m = zp.getOWLOntologyManager();
+    final OWLDataFactory f = m.getOWLDataFactory();
+    final OWLAnnotationProperty definitionSourceProperty =
         f.getOWLAnnotationProperty(definitionSourcePropertyIRI);
 
-    /*
-     * Should not happen.
-     */
+    // Catch "impossible" case.
     if (entry.sourceString == null) {
       System.err.println("source string null: " + entry.genxZfinId);
       return;
     }
 
     // add source information
-    OWLAnnotation sourceAnno =
+    final OWLAnnotation sourceAnno =
         f.getOWLAnnotation(definitionSourceProperty, f.getOWLLiteral(entry.sourceString));
-    OWLAxiom labelAnnoAxiom = f.getOWLAnnotationAssertionAxiom(cls.getIRI(), sourceAnno);
+    final OWLAxiom labelAnnoAxiom = f.getOWLAnnotationAssertionAxiom(cls.getIRI(), sourceAnno);
     m.addAxiom(zp, labelAnnoAxiom);
   }
 
   /**
    * Save the source information for all ZP classes in a separate file.
    * 
-   * @param zp
-   * @param fileName
+   * @param zp The ZP ontology to save.
+   * @param fileName The path to save to.
    */
   private static void saveSourceInformation(OWLOntology zp, String fileName) {
     BufferedWriter writer = null;
@@ -494,8 +507,8 @@ public class ZpGen {
 
       for (OWLClass cls : zp.getClassesInSignature()) {
 
-        String zpID = OBOVocabulary.IRI2ID(cls.getIRI());
-        if (zpID.startsWith("ZP:") == false) {
+        final String zpIid = OBOVocabulary.IRI2ID(cls.getIRI());
+        if (zpIid.startsWith("ZP:") == false) {
           // Ignore non ZP classes
           continue;
         }
@@ -514,13 +527,15 @@ public class ZpGen {
             sources.add(source);
           }
 
-          if (property.isLabel()) label = ((OWLLiteral) value).getLiteral();
+          if (property.isLabel()) {
+            label = ((OWLLiteral) value).getLiteral();
+          }
         }
 
         // write the information
         if (label != null && sources.size() > 0) {
           for (String source : sources) {
-            writer.append(zpID);
+            writer.append(zpIid);
             writer.append('\t');
             writer.append(label);
             writer.append('\t');

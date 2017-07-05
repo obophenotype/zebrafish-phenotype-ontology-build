@@ -88,17 +88,6 @@ import java.io.InputStreamReader;
  */
 public final class ZfinWalker {
 
-  /**
-   * Enumeration type for the precise file type.
-   */
-  public static enum ZfinFileType {
-    /** Phenotype-to-gene mapping. */
-    PHENO_GENES_TXT,
-    /** Phenotype-to-genotype mapping name. */
-    PHENO_GENOTYPES_TXT;
-  }
-
-
   /** Column for fish ID. */
   private static final int PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID = 0;
 

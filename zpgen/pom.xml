@@ -17,8 +17,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <junit.version>4.12</junit.version>
+    <checkstyle.version>2.17</checkstyle.version>
     <jcommander.version>1.30</jcommander.version>
+    <junit.version>4.12</junit.version>
     <owlapi.version>3.5.4</owlapi.version>
   </properties>
 
@@ -109,6 +110,18 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Code style checking -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${checkstyle.version}</version>
+        <configuration>
+          <consoleOutput>true</consoleOutput>
+          <configLocation>/google_checks.xml</configLocation>
+          <enableFilesSummary>false</enableFilesSummary>
+        </configuration>
       </plugin>
     </plugins>
   </build>

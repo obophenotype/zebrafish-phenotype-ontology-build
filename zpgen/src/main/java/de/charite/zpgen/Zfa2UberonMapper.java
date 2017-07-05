@@ -1,10 +1,9 @@
 package de.charite.zpgen;
 
+import com.google.common.collect.ImmutableSetMultimap;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
-import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Create a mapping of ZFA-class-IDs to UBERON-class-IDs using the UBERON in obo format. The UBERON

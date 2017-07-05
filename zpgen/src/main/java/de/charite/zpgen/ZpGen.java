@@ -1,5 +1,9 @@
 package de.charite.zpgen;
 
+import com.beust.jcommander.JCommander;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Lists;
+import de.charite.zpgen.ZfinWalker.ZFIN_FILE_TYPE;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +19,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
-
 import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
@@ -38,20 +41,18 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.SetOntologyID;
 
-import com.beust.jcommander.JCommander;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Lists;
-
-import de.charite.zpgen.ZfinWalker.ZFIN_FILE_TYPE;
-
 /**
  * Main class for ZP which constructs an zebrafish phenotype ontology from decomposed phenotype -
  * gene/geno associations.
- * 
+ *
+ * <p>
  * The purpose of this tool is to create an ontology from the definitions that can be found in the
  * files
- * 
- * Supports also negative annotations.
+ * </p>
+ *
+ * <p>
+ * Also supports negative association.
+ * </p>
  * 
  * <pre>
  * http://zfin.org/downloads/phenoGeneCleanData_fish.txt
@@ -63,8 +64,20 @@ import de.charite.zpgen.ZfinWalker.ZFIN_FILE_TYPE;
  * @author Heiko Dietze
  */
 public class ZpGen {
-  static private Logger log = Logger.getLogger(ZpGen.class.getName());
 
+  /** The Logger instance to use. */
+  static private Logger LOGGER = Logger.getLogger(ZpGen.class.getName());
+
+  /**
+   * Main entry point.
+   * 
+   * @param args Command line arguments.
+   *
+   * @throws OWLOntologyCreationException When the OWL ontology could not be created.
+   * @throws IOException In case of I/O errors.
+   * @throws InterruptedException When an interruption occurs.
+   * @throws OWLOntologyStorageException
+   */
   public static void main(String[] args) throws OWLOntologyCreationException, IOException,
       InterruptedException, OWLOntologyStorageException {
     ZpGenCliConfig zpCLIConfig = new ZpGenCliConfig();
@@ -110,7 +123,8 @@ public class ZpGen {
         // log.info("Ignoring non-existent file \"" +
         // ontologyOutputFilePath + "\" for keeping the ids");
         // zp = manager.createOntology(zpIRI);
-        log.severe("Could not find file \"" + previousOntologyFilePath + "\" for keeping the ids");
+        LOGGER
+            .severe("Could not find file \"" + previousOntologyFilePath + "\" for keeping the ids");
         throw new IllegalArgumentException("Keeping IDs was requested, but no previous file \""
             + previousOntologyFilePath + "\" was found! Prefer to stop here...");
 
@@ -137,15 +151,15 @@ public class ZpGen {
     ImmutableSetMultimap<String, String> zfa2uberon = null;
     if (addZfaUberonEquivalencies) {
 
-      log.info("creating ZFA-UBERON mapping");
+      LOGGER.info("creating ZFA-UBERON mapping");
       if (uberonOboFilePath == null) {
-        log.severe("No uberon-file was provided for creating the ZFA-UBERON-mapping.");
+        LOGGER.severe("No uberon-file was provided for creating the ZFA-UBERON-mapping.");
         throw new IllegalArgumentException(
             "ZFA-UBERON-mapping requested, but no uberon.obo file was provided! Use option --uberon-obo-file. Prefer to stop here...");
       }
       File uberonOntoFile = new File(uberonOboFilePath);
       if (!uberonOntoFile.exists()) {
-        log.severe("Could not find file \"" + uberonOboFilePath
+        LOGGER.severe("Could not find file \"" + uberonOboFilePath
             + "\" for creating the ZFA-UBERON-mapping.");
         throw new IllegalArgumentException("ZFA-UBERON-mapping requested, but no uberon.obo file \""
             + uberonOboFilePath + "\" was found! Prefer to stop here...");
@@ -239,7 +253,7 @@ public class ZpGen {
          * Important: exclude useless annotation that look like this ...ZFA:0001439|anatomical
          * system|||||||PATO:0000001|quality|abnormal|
          */
-        if (entry.entity1SupertermId.equals("ZFA:0001439") && entry.patoID.equals("PATO:0000001")
+        if (entry.entity1SupertermId.equals("ZFA:0001439") && entry.patoId.equals("PATO:0000001")
             && entry.entity1SubtermId.equals("") && entry.entity2SupertermId.equals("")
             && entry.entity2SubtermId.equals(""))
           return true;
@@ -253,7 +267,7 @@ public class ZpGen {
         EntryCorrector corrector = new EntryCorrector(entry);
         entry = corrector.getCorrectedEntry();
 
-        OWLClass pato = getQualiClassForOBOID(entry.patoID);
+        OWLClass pato = getQualiClassForOBOID(entry.patoId);
         OWLClass cl1 = getEntityClassForOBOID(entry.entity1SupertermId);
         OWLClassExpression intersectionExpression;
         String label;
@@ -401,11 +415,11 @@ public class ZpGen {
     if (useOwlRdfSyntax) {
       // save in owl/rdf syntax
       manager.saveOntology(zp, new RDFXMLOntologyFormat(), new FileOutputStream(of));
-      log.info("Wrote \"" + of.toString() + "\" in OWL/RDF syntax");
+      LOGGER.info("Wrote \"" + of.toString() + "\" in OWL/RDF syntax");
     } else {
       // save in manchester functional syntax
       manager.saveOntology(zp, new OWLFunctionalSyntaxOntologyFormat(), new FileOutputStream(of));
-      log.info("Wrote \"" + of.toString() + "\" in Manchester functional syntax");
+      LOGGER.info("Wrote \"" + of.toString() + "\" in Manchester functional syntax");
     }
 
     annotationPhenoTxtOut.close();
@@ -422,7 +436,7 @@ public class ZpGen {
     ZfinEntry rootEntry = new ZfinEntry();
     rootEntry.genxZfinId = "DUMMY";
     rootEntry.isAbnormal = true;
-    rootEntry.patoID = "PATO:0000001";
+    rootEntry.patoId = "PATO:0000001";
     rootEntry.patoName = "quality";
     rootEntry.entity1SupertermId = rootId;// "ZFA:0100000";
     rootEntry.entity1SupertermName = rootLabel;// "zebrafish anatomical entity";

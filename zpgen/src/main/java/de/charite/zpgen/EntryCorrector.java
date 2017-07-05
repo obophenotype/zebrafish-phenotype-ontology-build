@@ -43,14 +43,14 @@ public final class EntryCorrector {
    */
   public ZfinEntry getCorrectedEntry() {
     if (!entry.isAbnormal) {
-      if (entry.patoID.equals("PATO:0002050")) { // normal amount
-        entry.patoID = "PATO:0000070";
+      if (entry.patoId.equals("PATO:0002050")) { // normal amount
+        entry.patoId = "PATO:0000070";
         entry.patoName = "amount";
-      } else if (entry.patoID.equals("PATO:0001905")) { // has normal numbers of parts of type
-        entry.patoID = "PATO:0001555";
+      } else if (entry.patoId.equals("PATO:0001905")) { // has normal numbers of parts of type
+        entry.patoId = "PATO:0001555";
         entry.patoName = "has number of";
-      } else if (entry.patoID.equals("PATO:0000461")) { // normal
-        entry.patoID = "PATO:0000001";
+      } else if (entry.patoId.equals("PATO:0000461")) { // normal
+        entry.patoId = "PATO:0000001";
         entry.patoName = "quality";
       }
     }

@@ -1,5 +1,7 @@
 package de.charite.zpgen;
 
+// TODO: add getters, setters, use private visibility
+
 /**
  * A record type for representing an entry from ZFIN.
  * 
@@ -36,7 +38,7 @@ public final class ZfinEntry {
   public String entity2SubtermName;
 
   /** Pato identifier. */
-  public String patoID;
+  public String patoId;
 
   /** Pato name. */
   public String patoName;

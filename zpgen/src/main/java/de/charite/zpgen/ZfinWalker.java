@@ -135,7 +135,7 @@ public class ZfinWalker {
           entry.entity2SubtermId = sp[PHENO_GENE_COLUMN_TERM2_SUBTERM_ID];
           entry.entity2SubtermName = sp[PHENO_GENE_COLUMN_TERM2_SUBTERM_NAME];
 
-          entry.patoID = sp[PHENO_GENE_COLUMN_PATO_ID];
+          entry.patoId = sp[PHENO_GENE_COLUMN_PATO_ID];
           entry.patoName = sp[PHENO_GENE_COLUMN_PATO_NAME];
           entry.isAbnormal = sp[PHENO_GENE_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
 
@@ -155,7 +155,7 @@ public class ZfinWalker {
           entry.entity2SubtermId = sp[PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_ID];
           entry.entity2SubtermName = sp[PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_NAME];
 
-          entry.patoID = sp[PHENO_GENOTYPES_COLUMN_PATO_ID];
+          entry.patoId = sp[PHENO_GENOTYPES_COLUMN_PATO_ID];
           entry.patoName = sp[PHENO_GENOTYPES_COLUMN_PATO_NAME];
           entry.isAbnormal = sp[PHENO_GENOTYPES_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
           checkPhenotypeTag(sp[PHENO_GENOTYPES_COLUMN_PATO_MODIFIER], entry);
@@ -182,7 +182,7 @@ public class ZfinWalker {
     }
     if (string.equals("absent") && entry.entity1SupertermId.equals("GO:0007601")) {
       entry.isAbnormal = true;
-      entry.patoID = "PATO:0000462";
+      entry.patoId = "PATO:0000462";
       entry.patoName = "absent";
     }
   }
@@ -195,7 +195,7 @@ public class ZfinWalker {
       source.append(entry.entity1SubtermId); // affected_structure_or_process_1_subterm_id
     }
     source.append('\t');
-    source.append(entry.patoID); // phenotype_keyword_id
+    source.append(entry.patoId); // phenotype_keyword_id
     source.append('\t');
 
     // phenotype_modifier, currently always abnormal or normal

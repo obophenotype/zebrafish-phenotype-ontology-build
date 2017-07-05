@@ -1,9 +1,5 @@
 package de.charite.zpgen;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
@@ -12,6 +8,10 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Simple database for ZPO identifiers.

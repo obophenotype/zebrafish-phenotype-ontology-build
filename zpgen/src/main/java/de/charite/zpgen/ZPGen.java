@@ -54,12 +54,12 @@ import de.charite.zpgen.ZFINWalker.ZFIN_FILE_TYPE;
  * Supports also negative annotations.
  * 
  * <pre>
- * http://zfin.org/downloads/pheno.txt
- * http://zfin.org/downloads/phenotype.txt
+ * http://zfin.org/downloads/phenoGeneCleanData_fish.txt
+ * http://zfin.org/downloads/phenotype_fish.txt
  * </pre>
  * 
- * @author Sebastian Bauer
  * @author Sebastian Koehler
+ * @author Sebastian Bauer
  * @author Heiko Dietze
  */
 public class ZPGen {
@@ -83,7 +83,6 @@ public class ZPGen {
 		final String ontologyOutputFilePath = zpCLIConfig.ontologyOutputFilePath;
 		final String annotFilesFolder = zpCLIConfig.annotationsFolder;
 		final boolean keepIds = zpCLIConfig.keepIds;
-//		final boolean useInheresInPartOf = zpCLIConfig.useInheresInPartOf;
 		final boolean useOwlRdfSyntax = zpCLIConfig.useOwlRdfSyntax;
 
 		final boolean addZfaUberonEquivalencies = zpCLIConfig.addZfaUberonEquivalencies;
@@ -165,14 +164,7 @@ public class ZPGen {
 		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000050"));
 
 		// I have for now replaced the BFO-properties with the RO-properties
-		final OWLObjectProperty inheresProperty;
-//		if (useInheresInPartOf) {
-//			// inheres in part of
-//			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002314"));
-//		} else {
-			// inheres in (was before BFO_0000052)
-			inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
-//		}
+		final OWLObjectProperty inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
 
 		final OWLObjectProperty hasPart = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000051"));
 
@@ -204,13 +196,12 @@ public class ZPGen {
 			 */
 			private OWLClass getEntityClassForOBOID(String id) {
 
-				// not perfect, but there are only 2 refs to CARO in
-				// phenotype.txt
+				// not perfect, but there are only 2 refs to CARO in phenotype.txt
 				if (id.equals("CARO:0000010")) { // "anatomical boundary (CARO)"
 					id = "ZFA:0001689"; // ZFA anatomical line
 				}
 
-				if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:") || id.startsWith("MPATH:"))
+				if (id.startsWith("GO:") || id.startsWith("ZFA:") || id.startsWith("BSPO:") || id.startsWith("MPATH:")|| id.startsWith("CHEBI:"))
 					return factory.getOWLClass(OBOVocabulary.ID2IRI(id));
 
 				throw new RuntimeException("Unknown ontology prefix for name \"" + id + "\"");

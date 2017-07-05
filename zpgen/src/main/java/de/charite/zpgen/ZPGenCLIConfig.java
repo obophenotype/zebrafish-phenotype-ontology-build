@@ -39,9 +39,6 @@ public class ZPGenCLIConfig {
 	@Parameter(names = { "-s", "--source-information-output-file" }, required = false, description = "Add the source information to the ontology and save is also in a separate file. Implies --add-source-information set to true.")
 	public String sourceInformationFile = null;
 
-//	@Parameter(names = { "--use-inheres-in-part-of" }, required = false, description = "If set to true, 'inheres in' is replaced by 'inheres in part of'.")
-//	public boolean useInheresInPartOf = false;
-
 	@Parameter(names = { "--use-owlrdf-syntax" }, required = false, description = "If set to true, writes the output ontology in OWL-RDF syntax, which will otherwise be manchester functional syntax.")
 	public boolean useOwlRdfSyntax = false;
 

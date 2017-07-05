@@ -9,14 +9,6 @@
   <artifactId>zp</artifactId>
   <version>0.1-SNAPSHOT</version>
   
-  <repositories>
-   <repository>
-    <id>BerkeleyBOP</id>
-    <name>Berkeley BOP maven repository</name>
-    <url>http://code.berkeleybop.org/maven/repository/</url>
-   </repository>
-  </repositories>
-  
   <dependencies>
    <dependency>
     <groupId>junit</groupId>
@@ -31,7 +23,7 @@
    <dependency>
     <groupId>net.sourceforge.owlapi</groupId>
     <artifactId>owlapi-distribution</artifactId>
-    <version>3.5.2</version>
+    <version>3.5.4</version>
    </dependency>
   </dependencies>
 
@@ -42,8 +34,8 @@
      <artifactId>maven-compiler-plugin</artifactId>
      <version>3.0</version>
      <configuration>
-      <source>1.5</source>
-      <target>1.5</target>
+      <source>1.8</source>
+      <target>1.8</target>
      </configuration>
     </plugin>
 

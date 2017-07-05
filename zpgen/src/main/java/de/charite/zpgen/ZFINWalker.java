@@ -25,29 +25,29 @@ public class ZFINWalker {
 	};
 
 	/**
-	 * The current file format for phenotype.txt as of: 2015<br>
-	 * 0 Genotype ID <br>
-	 * 1 Genotype Name <br>
-	 * 2 Start Stage ID <br>
+	 * The current file format for http://zfin.org/downloads/phenotype_fish.txt as of: 2015<br>
+	 * 0 Fish ID<br>
+	 * 1 Fish Name<br>
+	 * 2 Start Stage ID<br>
 	 * 3 Start Stage Name<br>
 	 * 4 End Stage ID<br>
-	 * 5 End Stage Name <br>
-	 * 6 Affected Structure or Process 1 subterm ID <br>
-	 * 7 Affected Structure or Process 1 subterm Name <br>
-	 * 8 Post-composed Relationship ID <br>
-	 * 9 Post-composed Relationship Name <br>
-	 * 10 Affected Structure or Process 1 superterm ID <br>
-	 * 11 Affected Structure or Process 1 superterm Name <br>
-	 * 12 Phenotype Keyword ID <br>
-	 * 13 Phenotype Keyword Name <br>
-	 * 14 Phenotype Tag <br>
-	 * 15 Affected Structure or Process 2 subterm ID <br>
-	 * 16 Affected Structure or Process 2 subterm name <br>
-	 * 17 Post-composed Relationship (rel) ID <br>
-	 * 18 Post-composed Relationship (rel) Name <br>
-	 * 19 Affected Structure or Process 2 superterm ID <br>
-	 * 20 Affected Structure or Process 2 superterm name <br>
-	 * 21 Publication ID <br>
+	 * 5 End Stage Name<br>
+	 * 6 Affected Structure or Process 1 subterm ID<br>
+	 * 7 Affected Structure or Process 1 subterm Name<br>
+	 * 8 Post-composed Relationship ID<br>
+	 * 9 Post-composed Relationship Name<br>
+	 * 10 Affected Structure or Process 1 superterm ID<br>
+	 * 11 Affected Structure or Process 1 superterm Name<br>
+	 * 12 Phenotype Keyword ID<br>
+	 * 13 Phenotype Keyword Name<br>
+	 * 14 Phenotype Tag<br>
+	 * 15 Affected Structure or Process 2 subterm ID<br>
+	 * 16 Affected Structure or Process 2 subterm name<br>
+	 * 17 Post-composed Relationship (rel) ID<br>
+	 * 18 Post-composed Relationship (rel) Name<br>
+	 * 19 Affected Structure or Process 2 superterm ID<br>
+	 * 20 Affected Structure or Process 2 superterm name<br>
+	 * 21 Publication ID<br>
 	 * 22 Environment ID<br>
 	 */
 	private static final int PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID = 0;
@@ -66,7 +66,7 @@ public class ZFINWalker {
 	private static final int PHENO_GENOTYPES_COLUMN_PATO_MODIFIER = 14;
 
 	/**
-	 * The current file format for phenoGeneCleanData_fish.txt as of: Apr 2016<br>
+	 * The current file format for http://zfin.org/downloads/phenoGeneCleanData_fish.txt as of: Jul 2017<br>
 	 * 0 ID<br>
 	 * 1 Gene Symbol<br>
 	 * 2 Gene ID<br>
@@ -137,10 +137,9 @@ public class ZFINWalker {
 					entry.patoID = sp[PHENO_GENE_COLUMN_PATO_ID];
 					entry.patoName = sp[PHENO_GENE_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENO_GENE_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
-
-					// fix bug with 7 entries that use wrong phenotype-tag
-					// (usually only normal/abnormal allowed)
+					
 					checkPhenotypeTag(sp[PHENO_GENE_COLUMN_PATO_MODIFIER], entry);
+					
 				} else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT)) {
 
 					entry.genxZfinID = sp[PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID];
@@ -158,22 +157,14 @@ public class ZFINWalker {
 					entry.patoID = sp[PHENO_GENOTYPES_COLUMN_PATO_ID];
 					entry.patoName = sp[PHENO_GENOTYPES_COLUMN_PATO_NAME];
 					entry.isAbnormal = sp[PHENO_GENOTYPES_COLUMN_PATO_MODIFIER].equalsIgnoreCase("abnormal");
-
+					checkPhenotypeTag(sp[PHENO_GENOTYPES_COLUMN_PATO_MODIFIER], entry);
 				} else {
 					throw new IllegalArgumentException("Unrecognized zfin-file-type: " + zfinFileType);
 				}
 
 				// create the source string NOW
 				entry.sourceString = generateSourceString(entry);
-
-				// fix bug with 7 entries that use wrong phenotype-tag (usually
-				// only normal/abnormal allowed)
-				if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENES_TXT)) {
-					checkPhenotypeTag(sp[PHENO_GENE_COLUMN_PATO_MODIFIER], entry);
-				} else if (zfinFileType.equals(ZFIN_FILE_TYPE.PHENO_GENOTYPES_TXT)) {
-					checkPhenotypeTag(sp[PHENO_GENOTYPES_COLUMN_PATO_MODIFIER], entry);
-				}
-
+				
 				visitor.visit(entry, outPositiveAnnotations, outNegativeAnnotations);
 			} catch (Exception e) {
 				System.out.println("Problem in line: " + line);

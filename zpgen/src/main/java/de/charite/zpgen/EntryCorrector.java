@@ -9,10 +9,17 @@ package de.charite.zpgen;
  * replace with amount, because the "normal"-tag already indicates the fact that this is normal.
  * </p>
  *
- * An example line is:
+ * <h5>Example</h5>
+ *
+ * <p>
+ * An example line is as follows (wrapped to be more readable; ignore newlines).
+ * </p>
  *
  * <pre>
- * ZDB-GENE-030131-6223	100001615	51684	sufu					ZFA:0001086	muscle pioneer	PATO:0002050	normal amount	normal						
+ * ZDB-GENE-030131-6223&lt;TAB&gt;100001615&lt;TAB&gt;51684&lt;TAB&gt;sufu&lt;TAB&gt;&lt;TAB&gt;
+ * &lt;TAB&gt;&lt;TAB&gt;&lt;TAB&gt;ZFA:0001086&lt;TAB&gt;muscle&lt;TAB&gt;pioneer&lt;TAB&gt;
+ * PATO:0002050&lt;TAB&gt;normal amount&lt;TAB&gt;normal&lt;TAB&gt;&lt;TAB&gt;&lt;TAB&gt;
+ * &lt;TAB&gt;&lt;TAB&gt;&lt;TAB&gt;
  * </pre>
  *
  * @author Sebastian Koehler

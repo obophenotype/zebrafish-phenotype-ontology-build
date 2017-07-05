@@ -10,21 +10,22 @@ import com.google.common.collect.ImmutableSetMultimap;
  * Create a mapping of ZFA-class-IDs to UBERON-class-IDs using the UBERON in obo format. The UBERON
  * obo file contains xref-tags for the ZFA-classes.
  * 
+ * <p>
  * It may be possible that this is not important anymore, as we pull the full ZFA-ontology. But
  * still keep this as an option.
+ * </p>
  * 
- * @author Sebastian Köhler
- *
+ * @author Sebastian Kohler
  */
 public class Zfa2UberonMapper {
 
-  /**
-   * Using multimap because some ZFA-classes are xref'd by multiple UBERON classes
-   */
+  /** Using multimap because some ZFA-classes are xref'd by multiple UBERON classes. */
   private ImmutableSetMultimap<String, String> zfa2uberonIm = null;
 
   /**
-   * @param uberonOboFilePath
+   * Constructor.
+   *
+   * @param uberonOboFilePath Path to Uberon OBO file.
    */
   public Zfa2UberonMapper(String uberonOboFilePath) {
     try {

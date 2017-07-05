@@ -1,0 +1,53 @@
+ZDB-GENE-060126-1	ZP:0012832	abnormal(ly) amount pancreatic B cell	NOT
+ZDB-GENE-980526-221	ZP:0019064	abnormal(ly) alignment skeletal muscle cell towards skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0001519	abnormal(ly) broken skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0001519	abnormal(ly) broken skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019065	abnormal(ly) structure skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019064	abnormal(ly) alignment skeletal muscle cell towards skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019065	abnormal(ly) structure skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019064	abnormal(ly) alignment skeletal muscle cell towards skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0002170	abnormal(ly) process quality heart contraction	NOT
+ZDB-GENE-980526-221	ZP:0003323	abnormal(ly) process quality swimming behavior	NOT
+ZDB-GENE-980526-221	ZP:0019065	abnormal(ly) structure skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019064	abnormal(ly) alignment skeletal muscle cell towards skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0003323	abnormal(ly) process quality swimming behavior	NOT
+ZDB-GENE-980526-221	ZP:0019064	abnormal(ly) alignment skeletal muscle cell towards skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019064	abnormal(ly) alignment skeletal muscle cell towards skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0001519	abnormal(ly) broken skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019065	abnormal(ly) structure skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0001519	abnormal(ly) broken skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019065	abnormal(ly) structure skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0019065	abnormal(ly) structure skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0001519	abnormal(ly) broken skeletal muscle cell	NOT
+ZDB-GENE-980526-221	ZP:0002170	abnormal(ly) process quality heart contraction	NOT
+ZDB-GENE-980526-221	ZP:0001519	abnormal(ly) broken skeletal muscle cell	NOT
+ZDB-GENE-040429-2	ZP:0001301	abnormal(ly) morphology intersegmental vessel	NOT
+ZDB-GENE-040429-2	ZP:0001301	abnormal(ly) morphology intersegmental vessel	NOT
+ZDB-GENE-030131-4714	ZP:0019544	abnormal(ly) occurrence embryonic viscerocranium morphogenesis	NOT
+ZDB-GENE-030131-4714	ZP:0003089	abnormal(ly) morphology splanchnocranium	NOT
+ZDB-GENE-030131-4714	ZP:0019565	abnormal(ly) occurrence cranial skeletal system development	NOT
+ZDB-GENE-040426-1315	ZP:0001432	abnormal(ly) morphology whole organism	NOT
+ZDB-GENE-050114-2	ZP:0013034	abnormal(ly) amount interneuron	NOT
+ZDB-GENE-050114-2	ZP:0013034	abnormal(ly) amount interneuron	NOT
+ZDB-GENE-050114-2	ZP:0013034	abnormal(ly) amount interneuron	NOT
+ZDB-GENE-050114-2	ZP:0019926	abnormal(ly) spatial pattern interneuron	NOT
+ZDB-GENE-050114-2	ZP:0013034	abnormal(ly) amount interneuron	NOT
+ZDB-GENE-050114-2	ZP:0019926	abnormal(ly) spatial pattern interneuron	NOT
+ZDB-GENE-050114-2	ZP:0019926	abnormal(ly) spatial pattern interneuron	NOT
+ZDB-GENE-050114-2	ZP:0019926	abnormal(ly) spatial pattern interneuron	NOT
+ZDB-GENE-050531-1	ZP:0020156	abnormal(ly) lumenized intestine	NOT
+ZDB-GENE-050531-1	ZP:0020156	abnormal(ly) lumenized intestine	NOT
+ZDB-GENE-040625-147	ZP:0020620	abnormal(ly) amount anatomical structure	NOT
+ZDB-GENE-040625-147	ZP:0020620	abnormal(ly) amount anatomical structure	NOT
+ZDB-GENE-040625-147	ZP:0020620	abnormal(ly) amount anatomical structure	NOT
+ZDB-GENE-040625-147	ZP:0005325	abnormal(ly) decreased amount erythroid lineage cell	NOT
+ZDB-GENE-040625-147	ZP:0001342	abnormal(ly) aplastic head	NOT
+ZDB-GENE-040625-147	ZP:0020620	abnormal(ly) amount anatomical structure	NOT
+ZDB-GENE-040625-147	ZP:0020620	abnormal(ly) amount anatomical structure	NOT
+ZDB-GENE-980526-68	ZP:0001631	abnormal(ly) decreased length notochord	NOT
+ZDB-GENE-980526-68	ZP:0020814	abnormal(ly) decreased length somite anterior-posterior axis	NOT
+ZDB-GENE-980526-68	ZP:0002216	abnormal(ly) decreased amount somite adaxial cell	NOT
+ZDB-GENE-031002-48	ZP:0020950	abnormal(ly) amount ventricular myocardium Z disc	NOT
+ZDB-GENE-030818-1	ZP:0021187	abnormal(ly) present female organism	NOT
+ZDB-GENE-030818-1	ZP:0021189	abnormal(ly) occurrence female sex determination	NOT
+ZDB-GENE-030818-1	ZP:0015965	abnormal(ly) present ovary	NOT

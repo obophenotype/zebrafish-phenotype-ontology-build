@@ -232,7 +232,7 @@ public class ZPGen {
         throw new RuntimeException("Qualifier must be a pato term");
       }
 
-      public boolean visit(ZFINEntry entry, BufferedWriter outPositiveAnnotations,
+      public boolean visit(ZfinEntry entry, BufferedWriter outPositiveAnnotations,
           BufferedWriter outNegativeAnnotations) {
 
         /*
@@ -365,12 +365,12 @@ public class ZPGen {
     ZFIN zfinVisitor = new ZFIN();
 
     /* The zp entry that defines the root */
-    List<ZFINEntry> rootEntries = Lists.newArrayList();
+    List<ZfinEntry> rootEntries = Lists.newArrayList();
     rootEntries.add(getRootEntry("ZFA:0100000", "zebrafish anatomical entity"));
     rootEntries.add(getRootEntry("GO:0008150", "biological process"));
     rootEntries.add(getRootEntry("GO:0003674", "molecular function"));
     rootEntries.add(getRootEntry("GO:0005575", "cellular component"));
-    for (ZFINEntry rootEntry : rootEntries) {
+    for (ZfinEntry rootEntry : rootEntries) {
       zfinVisitor.visit(rootEntry, annotationPhenoTxtOut, negativePhenoTxtAnnotationOut);
       zfinVisitor.visit(rootEntry, annotationPhenotypeTxtOut, negativePhenotypeTxtAnnotationOut);
     }
@@ -418,8 +418,8 @@ public class ZPGen {
     }
   }
 
-  private static ZFINEntry getRootEntry(String rootId, String rootLabel) {
-    ZFINEntry rootEntry = new ZFINEntry();
+  private static ZfinEntry getRootEntry(String rootId, String rootLabel) {
+    ZfinEntry rootEntry = new ZfinEntry();
     rootEntry.genxZfinID = "DUMMY";
     rootEntry.isAbnormal = true;
     rootEntry.patoID = "PATO:0000001";
@@ -445,7 +445,7 @@ public class ZPGen {
    * @param entry
    * @param zp
    */
-  private static void addSourceInformation(OWLClass cls, ZFINEntry entry, OWLOntology zp) {
+  private static void addSourceInformation(OWLClass cls, ZfinEntry entry, OWLOntology zp) {
 
     OWLOntologyManager m = zp.getOWLOntologyManager();
     OWLDataFactory f = m.getOWLDataFactory();

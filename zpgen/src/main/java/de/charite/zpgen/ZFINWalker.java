@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Provides a method to walk a ZFIN file. Calls {@link ZFINVisitor#visit(ZFINEntry)} for each
+ * Provides a method to walk a ZFIN file. Calls {@link ZFINVisitor#visit(ZfinEntry)} for each
  * encountered entry.
  * 
  * See http://zfin.org/downloads for current format. This changes a lot...
@@ -115,7 +115,7 @@ public class ZFINWalker {
     String line;
     while ((line = in.readLine()) != null) {
       try {
-        ZFINEntry entry = new ZFINEntry();
+        ZfinEntry entry = new ZfinEntry();
         String[] sp = null;
         if (line.contains("|"))
           sp = line.split("\\|", -1);
@@ -175,7 +175,7 @@ public class ZFINWalker {
     }
   }
 
-  private static void checkPhenotypeTag(String string, ZFINEntry entry) {
+  private static void checkPhenotypeTag(String string, ZfinEntry entry) {
     if (!(string.equals("abnormal") || string.equals("normal"))) {
       System.err.println("wrong format for entry " + entry.genxZfinID
           + " expected normal/abnormal, found '" + string + "'");
@@ -187,7 +187,7 @@ public class ZFINWalker {
     }
   }
 
-  public static String generateSourceString(ZFINEntry entry) {
+  public static String generateSourceString(ZfinEntry entry) {
     StringBuilder source = new StringBuilder();
     source.append(entry.entity1SupertermId); // affected_structure_or_process_1_superterm_id
     source.append('\t');

@@ -6,7 +6,7 @@ package de.charite.zpgen;
  * @author Sebastian Bauer
  * @author Sebastian Koehler
  */
-public class ZFINEntry {
+public class ZfinEntry {
   /**
    * Gene or Geno
    */

@@ -15,6 +15,6 @@ public interface ZFINVisitor {
    * @param entry
    * @return
    */
-  boolean visit(ZFINEntry entry, BufferedWriter outPositiveAnnotations,
+  boolean visit(ZfinEntry entry, BufferedWriter outPositiveAnnotations,
       BufferedWriter outNegativeAnnotations);
 }

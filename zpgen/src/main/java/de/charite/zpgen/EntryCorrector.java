@@ -1,26 +1,40 @@
 package de.charite.zpgen;
 
 /**
+ * Hard-coded changes of ZFIN corrections.
+ *
+ * <p>
  * For several annotations that are normal we generate the abnormal counterpart. For this we
  * sometimes have to correct the PATO modifier used by the annotator. E.g. "normal amount" has to be
- * replace with amount, because the "normal"-tag already indicates the fact that this is normal<br>
- * <br>
- * An example line is:
- * <code>ZDB-GENE-030131-6223	100001615	51684	sufu					ZFA:0001086	muscle pioneer	PATO:0002050	normal amount	normal						
-</code>
- * 
- * @author Sebastian Koehler
+ * replace with amount, because the "normal"-tag already indicates the fact that this is normal.
+ * </p>
  *
+ * An example line is:
+ *
+ * <pre>
+ * ZDB-GENE-030131-6223	100001615	51684	sufu					ZFA:0001086	muscle pioneer	PATO:0002050	normal amount	normal						
+ * </pre>
+ *
+ * @author Sebastian Koehler
  */
-public class EntryCorrector {
+public final class EntryCorrector {
 
-  private ZFINEntry entry;
+  /** The entry to correct. */
+  private final ZfinEntry entry;
 
-  public EntryCorrector(ZFINEntry entry) {
+  /**
+   * Constructor.
+   *
+   * @param entry The {@link ZfinEntry} to correct.
+   */
+  public EntryCorrector(ZfinEntry entry) {
     this.entry = entry;
   }
 
-  public ZFINEntry getCorrectedEntry() {
+  /**
+   * @return The corrected {@link ZfinEntry}.
+   */
+  public ZfinEntry getCorrectedEntry() {
     if (!entry.isAbnormal) {
       if (entry.patoID.equals("PATO:0002050")) { // normal amount
         entry.patoID = "PATO:0000070";

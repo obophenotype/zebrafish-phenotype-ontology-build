@@ -6,28 +6,78 @@
 
   <groupId>de.charite.zp</groupId>
   <artifactId>zp</artifactId>
+  <packaging>jar</packaging>
   <version>0.1-SNAPSHOT</version>
 
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Zebrafish Phenotype Ontology Builder</description>
+  <url>https://github.com/phenomics/zebrafish-phenotype-ontology-builder</url>
+
+  <!-- Properties, mainly used for centrally defining versions. -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <junit.version>4.12</junit.version>
+    <jcommander.version>1.30</jcommander.version>
+    <owlapi.version>3.5.4</owlapi.version>
+  </properties>
+
+  <!-- License Information -->
+  <licenses>
+    <license>
+      <name>3-clause BSD</name>
+      <url>http://www.opensource.org/licenses/bsd-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <!-- Developers Information -->
+  <developers>
+    <developer>
+      <name>Sebastian Koehler</name>
+      <email>sebastian.koehler@charite.de</email>
+      <organization>Charite Universitaetsmedizin Berlin</organization>
+      <organizationUrl>https://www.charite.de</organizationUrl>
+    </developer>
+    <developer>
+      <name>Sebastian Bauer</name>
+      <email>mail@sebastianbauer.info</email>
+    </developer>
+    <developer>
+      <name>Manuel Holtgrewe</name>
+      <email>Manuel.Holtgrewe@bihealth.de</email>
+      <organization>Berlin Institute of Health</organization>
+      <organizationUrl>https://www.bihealth.de</organizationUrl>
+    </developer>
+  </developers>
+
   <dependencies>
+    <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- CLI Argument Parser -->
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.30</version>
+      <version>${jcommander.version}</version>
     </dependency>
+
+    <!-- OWL-API -->
     <dependency>
       <groupId>net.sourceforge.owlapi</groupId>
       <artifactId>owlapi-distribution</artifactId>
-      <version>3.5.4</version>
+      <version>${owlapi.version}</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- Compile with Java 8 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -38,6 +88,7 @@
         </configuration>
       </plugin>
 
+      <!-- Assembly of JAR file -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -61,13 +112,5 @@
       </plugin>
     </plugins>
   </build>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.10</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+
 </project>

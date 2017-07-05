@@ -29,7 +29,6 @@ public class Zfa2UberonMapper {
    */
   public Zfa2UberonMapper(String uberonOboFilePath) {
     try {
-
       BufferedReader in = new BufferedReader(new FileReader(uberonOboFilePath));
       String line = null;
       String currentUberonId = null;

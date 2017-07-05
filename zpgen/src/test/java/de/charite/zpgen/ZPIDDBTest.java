@@ -43,23 +43,23 @@ public class ZPIDDBTest {
 		OWLClass cl3 = factory.getOWLClass(IRI.create("TEST:3"));
 
 		OWLClassExpression expr1 = factory.getOWLObjectIntersectionOf(cl1, factory.getOWLObjectSomeValuesFrom(partOf, cl2));
-		IRI zp1IRI = zpIdDB.getZPId(expr1);
+		IRI zp1IRI = zpIdDB.getZpId(expr1);
 		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000001"), zp1IRI);
 		manager.addAxiom(testOntology, factory.getOWLEquivalentClassesAxiom(factory.getOWLClass(zp1IRI), expr1));
 
 		OWLClassExpression expr2 = factory.getOWLObjectIntersectionOf(cl1, factory.getOWLObjectSomeValuesFrom(partOf, cl3));
-		IRI zp2IRI = zpIdDB.getZPId(expr2);
+		IRI zp2IRI = zpIdDB.getZpId(expr2);
 		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000002"), zp2IRI);
 		manager.addAxiom(testOntology, factory.getOWLEquivalentClassesAxiom(factory.getOWLClass(zp2IRI), expr2));
 
 		OWLClassExpression expr1a = factory.getOWLObjectIntersectionOf(cl1a, factory.getOWLObjectSomeValuesFrom(partOf, cl2));
-		IRI zp1aIRI = zpIdDB.getZPId(expr1a);
+		IRI zp1aIRI = zpIdDB.getZpId(expr1a);
 		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000001"), zp1aIRI);
 		manager.addAxiom(testOntology, factory.getOWLEquivalentClassesAxiom(factory.getOWLClass(zp1IRI), expr1a));
 
 		OWLClassExpression expr3 = factory.getOWLObjectIntersectionOf(pato, cl1, factory.getOWLObjectSomeValuesFrom(partOf, cl3));
-		IRI zp3IRI = zpIdDB.getZPId(expr3);
-		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000003"), zpIdDB.getZPId(expr3));
+		IRI zp3IRI = zpIdDB.getZpId(expr3);
+		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000003"), zpIdDB.getZpId(expr3));
 		manager.addAxiom(testOntology, factory.getOWLEquivalentClassesAxiom(factory.getOWLClass(zp3IRI), expr3));
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -82,13 +82,13 @@ public class ZPIDDBTest {
 		final OWLObjectProperty partOf2 = factory2.getOWLObjectProperty(IRI.create(zpIRI + "BFO_0000050"));
 
 		OWLClassExpression expr22 = factory2.getOWLObjectIntersectionOf(cl1, factory.getOWLObjectSomeValuesFrom(partOf, cl23));
-		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000002"), zpIdDB2.getZPId(expr22));
+		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000002"), zpIdDB2.getZpId(expr22));
 
 		OWLClassExpression expr21 = factory2.getOWLObjectIntersectionOf(cl21, factory.getOWLObjectSomeValuesFrom(partOf2, cl22));
-		Assert.assertEquals(zp1IRI, zpIdDB2.getZPId(expr21));
+		Assert.assertEquals(zp1IRI, zpIdDB2.getZpId(expr21));
 
 		OWLClassExpression expr24 = factory2.getOWLObjectIntersectionOf(cl24, factory.getOWLObjectSomeValuesFrom(partOf2, cl22));
-		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000004"), zpIdDB2.getZPId(expr24));
+		Assert.assertEquals(OBOVocabulary.ID2IRI("ZP:0000004"), zpIdDB2.getZpId(expr24));
 
 	}
 }

@@ -323,7 +323,7 @@ public class ZpGen {
             factory.getOWLObjectSomeValuesFrom(hasPart, intersectionExpression);
 
         // get the class
-        IRI zpIRI = zpIdDB.getZPId(owlSomeClassExp);
+        IRI zpIRI = zpIdDB.getZpId(owlSomeClassExp);
         String zpID = OBOVocabulary.IRI2ID(zpIRI);
         OWLClass zpTerm = factory.getOWLClass(zpIRI);
 

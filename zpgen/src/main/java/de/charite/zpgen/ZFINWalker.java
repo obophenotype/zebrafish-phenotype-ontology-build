@@ -53,11 +53,15 @@ public class ZFINWalker {
 	private static final int PHENO_GENOTYPES_COLUMN_ZFIN_GENO_ID = 0;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUBTERM_ID = 6;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUBTERM_NAME = 7;
+	private static final int PHENO_GENOTYPES_COLUMN_TERM1_RELATIONSHIP_ID = 8;
+	private static final int PHENO_GENOTYPES_COLUMN_TERM1_RELATIONSHIP_NAME = 9;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_ID = 10;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_NAME = 11;
 
 	private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_ID = 15;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_NAME = 16;
+	private static final int PHENO_GENOTYPES_COLUMN_TERM2_RELATIONSHIP_ID =17;
+	private static final int PHENO_GENOTYPES_COLUMN_TERM2_RELATIONSHIP_NAME = 18;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUPERTERM_ID = 19;
 	private static final int PHENO_GENOTYPES_COLUMN_TERM2_SUPERTERM_NAME = 20;
 
@@ -96,11 +100,15 @@ public class ZFINWalker {
 	private static final int PHENO_GENE_COLUMN_ZFIN_GENE_ID = 2;
 	private static final int PHENO_GENE_COLUMN_TERM1_SUBTERM_ID = 3;
 	private static final int PHENO_GENE_COLUMN_TERM1_SUBTERM_NAME = 4;
+	private static final int PHENO_GENE_COLUMN_TERM1_RELATIONSHIP_ID = 5;
+	private static final int PHENO_GENE_COLUMN_TERM1_RELATIONSHIP_NAME = 6;
 	private static final int PHENO_GENE_COLUMN_TERM1_SUPERTERM_ID = 7;
 	private static final int PHENO_GENE_COLUMN_TERM1_SUPERTERM_NAME = 8;
 
 	private static final int PHENO_GENE_COLUMN_TERM2_SUBTERM_ID = 12;
 	private static final int PHENO_GENE_COLUMN_TERM2_SUBTERM_NAME = 13;
+	private static final int PHENO_GENE_COLUMN_TERM2_RELATIONSHIP_ID = 14;
+	private static final int PHENO_GENE_COLUMN_TERM2_RELATIONSHIP_NAME = 15;
 	private static final int PHENO_GENE_COLUMN_TERM2_SUPERTERM_ID = 16;
 	private static final int PHENO_GENE_COLUMN_TERM2_SUPERTERM_NAME = 17;
 
@@ -128,11 +136,15 @@ public class ZFINWalker {
 					entry.entity1SupertermName = sp[PHENO_GENE_COLUMN_TERM1_SUPERTERM_NAME];
 					entry.entity1SubtermId = sp[PHENO_GENE_COLUMN_TERM1_SUBTERM_ID];
 					entry.entity1SubtermName = sp[PHENO_GENE_COLUMN_TERM1_SUBTERM_NAME];
+					entry.entity1RelationshipId = sp[PHENO_GENE_COLUMN_TERM1_RELATIONSHIP_ID];
+					entry.entity1RelationshipName = sp[PHENO_GENE_COLUMN_TERM1_RELATIONSHIP_NAME];
 
 					entry.entity2SupertermId = sp[PHENO_GENE_COLUMN_TERM2_SUPERTERM_ID];
 					entry.entity2SupertermName = sp[PHENO_GENE_COLUMN_TERM2_SUPERTERM_NAME];
 					entry.entity2SubtermId = sp[PHENO_GENE_COLUMN_TERM2_SUBTERM_ID];
 					entry.entity2SubtermName = sp[PHENO_GENE_COLUMN_TERM2_SUBTERM_NAME];
+					entry.entity2RelationshipId = sp[PHENO_GENE_COLUMN_TERM2_RELATIONSHIP_ID];
+					entry.entity2RelationshipName = sp[PHENO_GENE_COLUMN_TERM2_RELATIONSHIP_NAME];
 
 					entry.patoID = sp[PHENO_GENE_COLUMN_PATO_ID];
 					entry.patoName = sp[PHENO_GENE_COLUMN_PATO_NAME];
@@ -148,11 +160,15 @@ public class ZFINWalker {
 					entry.entity1SupertermName = sp[PHENO_GENOTYPES_COLUMN_TERM1_SUPERTERM_NAME];
 					entry.entity1SubtermId = sp[PHENO_GENOTYPES_COLUMN_TERM1_SUBTERM_ID];
 					entry.entity1SubtermName = sp[PHENO_GENOTYPES_COLUMN_TERM1_SUBTERM_NAME];
+					entry.entity1RelationshipId = sp[PHENO_GENOTYPES_COLUMN_TERM1_RELATIONSHIP_ID];
+					entry.entity1RelationshipName = sp[PHENO_GENOTYPES_COLUMN_TERM1_RELATIONSHIP_NAME];
 
 					entry.entity2SupertermId = sp[PHENO_GENOTYPES_COLUMN_TERM2_SUPERTERM_ID];
 					entry.entity2SupertermName = sp[PHENO_GENOTYPES_COLUMN_TERM2_SUPERTERM_NAME];
 					entry.entity2SubtermId = sp[PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_ID];
 					entry.entity2SubtermName = sp[PHENO_GENOTYPES_COLUMN_TERM2_SUBTERM_NAME];
+					entry.entity2RelationshipId = sp[PHENO_GENOTYPES_COLUMN_TERM2_RELATIONSHIP_ID];
+					entry.entity2RelationshipName = sp[PHENO_GENOTYPES_COLUMN_TERM2_RELATIONSHIP_NAME];
 
 					entry.patoID = sp[PHENO_GENOTYPES_COLUMN_PATO_ID];
 					entry.patoName = sp[PHENO_GENOTYPES_COLUMN_PATO_NAME];
@@ -189,6 +205,10 @@ public class ZFINWalker {
 		StringBuilder source = new StringBuilder();
 		source.append(entry.entity1SupertermId); // affected_structure_or_process_1_superterm_id
 		source.append('\t');
+		if (entry.entity1RelationshipId != null) {
+			source.append(entry.entity1RelationshipId); // affected_structure_or_process_1_relationship_id
+		}
+		source.append('\t');
 		if (entry.entity1SubtermId != null) {
 			source.append(entry.entity1SubtermId); // affected_structure_or_process_1_subterm_id
 		}
@@ -205,6 +225,10 @@ public class ZFINWalker {
 		source.append('\t');
 		if (entry.entity2SupertermId != null) {
 			source.append(entry.entity2SupertermId);// affected_structure_or_process_2_superterm_id
+		}
+		source.append('\t');
+		if (entry.entity2RelationshipId != null) {
+			source.append(entry.entity2RelationshipId); // affected_structure_or_process_2_relationship_id
 		}
 		source.append('\t');
 		if (entry.entity2SubtermId != null) {

@@ -161,7 +161,6 @@ public class ZPGen {
 
 		// was before BFO_0000070
 		final OWLObjectProperty towards = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0002503"));
-		final OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "BFO_0000050"));
 
 		// I have for now replaced the BFO-properties with the RO-properties
 		final OWLObjectProperty inheresProperty = factory.getOWLObjectProperty(IRI.create(purlOboIRI + "RO_0000052"));
@@ -255,15 +254,16 @@ public class ZPGen {
 				intersectionList.add(factory.getOWLObjectSomeValuesFrom(has_modifier, abnormal));
 
 				/* Entity 1: Create intersections */
-				if (entry.entity1SubtermId != null && entry.entity1SubtermId.length() > 0) {
+				if (entry.entity1SubtermId != null && entry.entity1SubtermId.length() > 0 && entry.entity1RelationshipId != null && entry.entity1RelationshipId.length() > 0) {
 					/*
 					 * Pattern is (all-some interpretation): <pato> inheres_in
 					 * (<cl2> part of <cl1>) AND qualifier abnormal
 					 */
 					OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
+					OWLObjectProperty rel = factory.getOWLObjectProperty(OBOVocabulary.ID2IRI(entry.entity1RelationshipId));
 
 					intersectionList.add(factory.getOWLObjectSomeValuesFrom(inheresProperty,
-							factory.getOWLObjectIntersectionOf(cl2, factory.getOWLObjectSomeValuesFrom(partOf, cl1))));
+							factory.getOWLObjectIntersectionOf(cl2, factory.getOWLObjectSomeValuesFrom(rel, cl1))));
 
 					/*
 					 * Note that is language the last word is the more specific
@@ -285,16 +285,17 @@ public class ZPGen {
 
 					OWLClass cl3 = getEntityClassForOBOID(entry.entity2SupertermId);
 
-					if (entry.entity2SubtermId != null && entry.entity2SubtermId.length() > 0) {
+					if (entry.entity2SubtermId != null && entry.entity2SubtermId.length() > 0 && entry.entity2RelationshipId != null && entry.entity2RelationshipId.length() > 0) {
 						/*
 						 * Pattern is (all-some interpretation): <pato>
 						 * inheres_in (<cl2> part of <cl1>) AND qualifier
 						 * abnormal
 						 */
 						OWLClass cl4 = getEntityClassForOBOID(entry.entity2SubtermId);
+						OWLObjectProperty rel = factory.getOWLObjectProperty(OBOVocabulary.ID2IRI(entry.entity2RelationshipId));
 
 						intersectionList.add(factory.getOWLObjectSomeValuesFrom(towards,
-								factory.getOWLObjectIntersectionOf(cl4, factory.getOWLObjectSomeValuesFrom(partOf, cl3))));
+								factory.getOWLObjectIntersectionOf(cl4, factory.getOWLObjectSomeValuesFrom(rel, cl3))));
 
 						/*
 						 * Note that is language the last word is the more

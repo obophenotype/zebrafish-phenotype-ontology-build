@@ -423,7 +423,7 @@ public class ZPGen {
 	 * Custom IRI for the annotation property for the definition of the class
 	 * expression.
 	 */
-	static final IRI definitionSourcePropertyIRI = IRI.create("http://zfin/definition/source_information");
+	static final IRI definitionSourcePropertyIRI = IRI.create("http://zfin.org/definition/source_information");
 
 	/**
 	 * Add the source information for the definition of the equivalent class

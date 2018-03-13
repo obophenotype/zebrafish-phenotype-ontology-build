@@ -257,7 +257,7 @@ public class ZPGen {
 				if (entry.entity1SubtermId != null && entry.entity1SubtermId.length() > 0 && entry.entity1RelationshipId != null && entry.entity1RelationshipId.length() > 0) {
 					/*
 					 * Pattern is (all-some interpretation): <pato> inheres_in
-					 * (<cl2> part of <cl1>) AND qualifier abnormal
+					 * (<cl2> <rel> <cl1>) AND qualifier abnormal
 					 */
 					OWLClass cl2 = getEntityClassForOBOID(entry.entity1SubtermId);
 					OWLObjectProperty rel = factory.getOWLObjectProperty(OBOVocabulary.ID2IRI(entry.entity1RelationshipId));
@@ -288,7 +288,7 @@ public class ZPGen {
 					if (entry.entity2SubtermId != null && entry.entity2SubtermId.length() > 0 && entry.entity2RelationshipId != null && entry.entity2RelationshipId.length() > 0) {
 						/*
 						 * Pattern is (all-some interpretation): <pato>
-						 * inheres_in (<cl2> part of <cl1>) AND qualifier
+						 * inheres_in (<cl2> <rel> <cl1>) AND qualifier
 						 * abnormal
 						 */
 						OWLClass cl4 = getEntityClassForOBOID(entry.entity2SubtermId);
